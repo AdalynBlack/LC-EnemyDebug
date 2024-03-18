@@ -1,0 +1,19 @@
+using HarmonyLib;
+using UnityEngine;
+
+namespace EnemyDebug.Patches;
+
+public class SpringManPatches
+{
+	[HarmonyPatch(typeof(SpringManAI), "Update")]
+	[HarmonyPostfix]
+	static void UpdatePostfixPatch(SpringManAI __instance)
+	{
+		if(__instance.currentBehaviourStateIndex == 1)
+		{
+			GizmoPatches.DrawSphere(__instance.transform.position + Vector3.up * 1.6f, 0.5f);
+		} else {
+			GizmoPatches.DrawSphere(__instance.transform.position + Vector3.up * 5f, 0.5f);
+		}
+	}
+}
