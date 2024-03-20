@@ -13,7 +13,7 @@ public class SpringManPatches
 		{
 			GizmoPatches.DrawSphere(__instance.transform.position + Vector3.up * 1.6f, 0.5f);
 		} else {
-			GizmoPatches.DrawSphere(__instance.transform.position + Vector3.up * 5f, 0.5f);
+			GizmoPatches.DrawSphere(__instance.transform.position + Vector3.up * 0.5f, 0.5f);
 		}
 	}
 }
