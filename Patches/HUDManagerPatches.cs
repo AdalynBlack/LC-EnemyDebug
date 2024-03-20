@@ -17,13 +17,11 @@ public class HUDManagerPatches
 			return false;
 
 		var subtextBox = __instance.scanElements[elementIndex].gameObject.GetComponentsInChildren<Image>()[3];
-		EnemyDebug.HarmonyLog.LogDebug($"{subtextBox.gameObject}");
 		var subtextTransform = subtextBox.GetComponent<RectTransform>();
 
 		subtext.verticalAlignment = VerticalAlignmentOptions.Top;
 
 		var lineCount = subtext.textInfo.lineCount;
-		EnemyDebug.HarmonyLog.LogDebug($"Lines to fit: {lineCount}");
 		subtextTransform.localScale = new Vector3(1, lineCount, 1);
 		subtextTransform.anchoredPosition = new Vector3(145.64f, 11.12f - (7.27f * lineCount), 1);
 
