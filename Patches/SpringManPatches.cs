@@ -11,9 +11,9 @@ public class SpringManPatches
 	{
 		if(__instance.currentBehaviourStateIndex == 1)
 		{
-			GizmoPatches.DrawSphere(__instance.transform.position + Vector3.up * 1.6f, 0.5f);
+			GizmoPatches.DrawSphere(__instance.transform.position + Vector3.up * 1.6f, 0.2f);
 		} else {
-			GizmoPatches.DrawSphere(__instance.transform.position + Vector3.up * 0.5f, 0.5f);
+			GizmoPatches.DrawSphere(__instance.transform.position + Vector3.up * 0.5f, 0.2f);
 		}
 	}
 }
