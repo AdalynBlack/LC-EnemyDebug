@@ -12,12 +12,7 @@ public class HUDManagerPatches
 	[HarmonyPrefix]
 	static bool NodeVisibilityPatch(HUDManager __instance, ScanNodeProperties node, int elementIndex, ref bool __result)
 	{
-		var headertext = __instance.scanElements[elementIndex].gameObject.GetComponentsInChildren<TextMeshProUGUI>()[0];
-		headertext.color = Color.white;
-		headertext.overrideColorTags = true;
 		var subtext = __instance.scanElements[elementIndex].gameObject.GetComponentsInChildren<TextMeshProUGUI>()[1];
-		subtext.color = Color.white;
-		subtext.overrideColorTags = true;
 
 		var subtextBox = __instance.scanElements[elementIndex].gameObject.GetComponentsInChildren<Image>()[3];
 		EnemyDebug.HarmonyLog.LogDebug($"{subtextBox.gameObject}");
