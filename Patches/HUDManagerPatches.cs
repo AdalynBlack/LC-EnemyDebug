@@ -16,14 +16,16 @@ public class HUDManagerPatches
 		if(subtext.textInfo == null)
 			return false;
 
+		subtext.verticalAlignment = VerticalAlignmentOptions.Top;
+
 		var subtextBox = __instance.scanElements[elementIndex].gameObject.GetComponentsInChildren<Image>()[3];
 		var subtextTransform = subtextBox.GetComponent<RectTransform>();
 
-		subtext.verticalAlignment = VerticalAlignmentOptions.Top;
-
 		var lineCount = subtext.textInfo.lineCount;
-		subtextTransform.localScale = new Vector3(1, lineCount, 1);
-		subtextTransform.anchoredPosition = new Vector3(145.64f, 11.12f - (7.27f * lineCount), 1);
+		subtextTransform.localScale = new Vector3(1f, lineCount, 1f);
+
+		// for some reason, changing the x value does nothing. Only the y value seems to have an effect
+		subtextTransform.anchoredPosition = new Vector2(145.64f, 12.12f - (7.27f * lineCount));
 
 		__instance.scanElements[elementIndex].gameObject.SetActive(
 				// Reflection to access __instance.nodesOnScreen and run the "Contains" method using node
