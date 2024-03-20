@@ -36,13 +36,16 @@ public class HUDManagerPatches
 		return false;
 	}
 
-	[HarmonyPatch(typeof(HUDManager), "AssignNewNodes")]
+	[HarmonyPatch(typeof(HUDManager), "PingScan_performed")]
 	[HarmonyPrefix]
-	static void AssignNewNodesPatch(HUDManager __instance)
+	static void PingScanClearNodes(HUDManager __instance)
 	{
-		var scanNodes = (Dictionary<RectTransform, ScanNodeProperties>)typeof(HUDManager).GetField("scanNodes", System.Reflection.BindingFlags.NonPublic
-				| System.Reflection.BindingFlags.Instance).GetValue(__instance);
+		var scanNodes = (Dictionary<RectTransform, ScanNodeProperties>)AccessTools.Field(typeof(HUDManager), "scanNodes").GetValue(__instance);
 
-		scanNodes.Clear();
+		foreach (var element in __instance.scanElements)
+		{
+			scanNodes.Remove(element);
+			element.gameObject.SetActive(false);
+		}
 	}
 }
