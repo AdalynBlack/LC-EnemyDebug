@@ -27,6 +27,11 @@ public class HUDManagerPatches
 		subtextTransform.localScale = new Vector3(1, lineCount, 1);
 		subtextTransform.anchoredPosition = new Vector3(145.64f, 11.12f - (7.27f * lineCount), 1);
 
+		__instance.scanElements[elementIndex].gameObject.SetActive(
+				// Reflection to access __instance.nodesOnScreen and run the "Contains" method using node
+				((List<ScanNodeProperties>)(AccessTools.Field(typeof(HUDManager), "nodesOnScreen").GetValue(__instance)))
+				.Contains(node));
+
 		__result = false;
 		return false;
 	}
