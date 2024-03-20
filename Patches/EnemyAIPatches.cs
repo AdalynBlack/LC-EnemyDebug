@@ -35,13 +35,14 @@ public class EnemyAIPatches
 		nodeProps.maxRange = 120;
 		nodeProps.minRange = 0;
 		nodeProps.requiresLineOfSight = false;
+		nodeProps.headerText = $"{__instance.GetType().ToString()}: ";
 
 		SearchDebug(__instance, nodeProps);
 	}
 
 	private static void AlternateNodeProps(EnemyAI __instance, ScanNodeProperties nodeProps)
 	{
-		nodeProps.headerText = "Current State";
+		nodeProps.headerText += "Current State";
 		nodeProps.subText = $"{__instance.currentBehaviourStateIndex}";
 	}
 
@@ -57,7 +58,7 @@ public class EnemyAIPatches
 			return;
 		}
 
-		nodeProps.headerText = "Searching";
+		nodeProps.headerText += "Searching";
 		nodeProps.subText = $"{search.nodesEliminatedInCurrentSearch}/{__instance.allAINodes.Length} nodes searched\n";
 		nodeProps.subText += $"Search width: {search.searchWidth}\n";
 		nodeProps.subText += $"Search precision: {search.searchPrecision}\n";
