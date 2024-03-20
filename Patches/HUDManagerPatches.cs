@@ -22,10 +22,11 @@ public class HUDManagerPatches
 		var subtextTransform = subtextBox.GetComponent<RectTransform>();
 
 		var lineCount = subtext.textInfo.lineCount;
-		subtextTransform.localScale = new Vector3(1f, lineCount, 1f);
+		var scaleAmount = (0.4f + (0.6f * lineCount));
+		subtextTransform.localScale = new Vector3(1f, scaleAmount, 1f);
 
 		// for some reason, changing the x value does nothing. Only the y value seems to have an effect
-		subtextTransform.anchoredPosition = new Vector2(145.64f, 12.12f - (7.27f * lineCount));
+		subtextTransform.anchoredPosition = new Vector2(145.64f, 12.12f - (7.27f * scaleAmount));
 
 		__instance.scanElements[elementIndex].gameObject.SetActive(
 				// Reflection to access __instance.nodesOnScreen and run the "Contains" method using node
