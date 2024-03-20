@@ -30,7 +30,9 @@ public class EnemyAIPatches
 		GizmoPatches.DrawSphere(__instance.transform.position, 0.2f, color: new Color(1f, 0f, 0f));
 
 		var nodeProps = __instance.GetComponentInChildren<ScanNodeProperties>();
-		nodeProps.maxRange = 1000;
+
+		// Scan can't reach further than 120 units (80 units long, plus 20 units offset, plus 20 units radius)
+		nodeProps.maxRange = 120;
 		nodeProps.minRange = 0;
 		nodeProps.requiresLineOfSight = false;
 
