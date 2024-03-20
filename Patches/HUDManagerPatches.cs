@@ -13,6 +13,8 @@ public class HUDManagerPatches
 	static bool NodeVisibilityPatch(HUDManager __instance, ScanNodeProperties node, int elementIndex, ref bool __result)
 	{
 		var subtext = __instance.scanElements[elementIndex].gameObject.GetComponentsInChildren<TextMeshProUGUI>()[1];
+		if(subtext.textInfo == null)
+			return false;
 
 		var subtextBox = __instance.scanElements[elementIndex].gameObject.GetComponentsInChildren<Image>()[3];
 		EnemyDebug.HarmonyLog.LogDebug($"{subtextBox.gameObject}");
