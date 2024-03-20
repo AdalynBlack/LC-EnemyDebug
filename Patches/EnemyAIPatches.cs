@@ -29,13 +29,43 @@ public class EnemyAIPatches
 
 		GizmoPatches.DrawSphere(__instance.transform.position, 0.2f, color: new Color(1f, 0f, 0f));
 
+		var nodeProps = __instance.GetComponentInChildren<ScanNodeProperties>();
+		nodeProps.maxRange = 1000;
+		nodeProps.minRange = 0;
+		nodeProps.requiresLineOfSight = false;
+
+		SearchDebug(__instance, nodeProps);
+	}
+
+	private static void AlternateNodeProps(EnemyAI __instance, ScanNodeProperties nodeProps)
+	{
+		nodeProps.headerText = "Current State";
+		nodeProps.subText = $"{__instance.currentBehaviourStateIndex}";
+	}
+
+	private static void SearchDebug(EnemyAI __instance, ScanNodeProperties nodeProps)
+	{
 		var search = __instance.currentSearch;
 		if(search == null)
 			return;
 
 		if(!search.inProgress)
+		{
+			AlternateNodeProps(__instance, nodeProps);
 			return;
+		}
 
+		nodeProps.headerText = "Searching";
+		nodeProps.subText = $"{search.nodesEliminatedInCurrentSearch}/{__instance.allAINodes.Length} nodes searched\n";
+		nodeProps.subText += $"Search width: {search.searchWidth}\n";
+		nodeProps.subText += $"Search precision: {search.searchPrecision}\n";
+		nodeProps.subText += $"Has finished {search.timesFinishingSearch} times\n";
+		nodeProps.subText += $"Randomized? {search.randomized}\n";
+		nodeProps.subText += $"Waiting for target? {search.waitingForTargetNode}\n";
+		nodeProps.subText += $"Target chosen? {search.choseTargetNode}\n";
+		nodeProps.subText += $"Looping? {search.loopSearch}\n";
+		nodeProps.subText += $"Calculating node? {search.calculatingNodeInSearch}";
+		
 		foreach(var node in __instance.allAINodes)
 		{
 			if(search.unsearchedNodes.Contains(node))
