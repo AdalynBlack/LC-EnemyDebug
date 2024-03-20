@@ -1,11 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
-		<AssemblyName>EnemyDebug</AssemblyName>
+		<AssemblyName>com.adibtw.enemydebug</AssemblyName>
+		<Product>Enemy Debug</Product>
 		<Description>Enables enemy debugging</Description>
 		<Version>0.0.0</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
+
+		<ThunderDeps>["BepInEx-BepInExPack-5.4.2100"]</ThunderDeps>
+		<ThunderURL>https://github.com/AdalynBlack/LC-EnemyDebug</ThunderURL>
+
+		<LaunchCommand Condition="$(OS) == Windows_NT">&quot;$(LC_PATH)\Lethal Company.exe&quot; --doorstop-enable true --doorstop-target &quot;$(PROFILE_PATH)\..\core\BepInEx.Preloader.dll&quot;</LaunchCommand>
+		<LaunchCommand Condition="$(OS) == UNIX">wine &quot;$(LC_PATH)/Lethal Company.exe&quot; --doorstop-enable true --doorstop-target &quot;$(PROFILE_PATH)/../core/BepInEx.Preloader.dll&quot; &amp;</LaunchCommand>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -22,6 +29,15 @@
 		<Reference Include="UnityEngine.Netcode.Runtime">
 			<HintPath>$(LC_PATH)\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
 		</Reference>
+		<Reference Include="UnityEngine.TextMeshPro">
+			<HintPath>$(LC_PATH)\Lethal Company_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UI">
+			<HintPath>$(LC_PATH)\Lethal Company_Data\Managed\UnityEngine.UI.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.InputSystem">
+			<HintPath>$(LC_PATH)\Lethal Company_Data\Managed\Unity.InputSystem.dll</HintPath>
+		</Reference>
 		<Reference Include="LethalConfig">
 			<HintPath>.\Deps\Hard\LethalConfig.dll</HintPath>
 		</Reference>
@@ -36,4 +52,26 @@
 	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
 	</ItemGroup>
+
+	<Target Name="PackageThunderstore" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+		<Message Text="Zipping Files for Thunderstore" Importance="High"/>
+		<Delete Files="$(Product)Thunderstore.zip"/>
+		<WriteLinesToFile File="manifest.json" Lines="{&quot;name&quot;: &quot;$(Product)&quot;,&quot;description&quot;: &quot;$(Description)&quot;,&quot;version_number&quot;: &quot;$(Version)&quot;,&quot;dependencies&quot;: $(ThunderDeps),&quot;website_url&quot;: &quot;$(ThunderURL)&quot;}" Overwrite="true"/>
+		<Exec Command="zip -j $(Product)Thunderstore.zip README.md icon.png bin/Release/$(TargetFramework)/$(AssemblyName).dll manifest.json"/>
+		<Delete Files="manifest.json"/>
+	</Target>
+
+	<Target Name="AddChangelogToPackage" AfterTargets="PackageThunderstore" Condition="'$(Configuration)' == 'Release' And Exists('CHANGELOG.md')">
+		<Message Text="Adding Changelog to Package" Importance="High"/>
+		<Exec Command="zip $(Product)Thunderstore.zip CHANGELOG.md"/>
+	</Target>
+
+	<Target Name="AddToProfile" AfterTargets="Build">
+		<Message Text="Copying Compiled Mod $(Product) to Profile Plugins Folder" Importance="High"/>
+		<Copy SourceFiles="bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).dll" DestinationFolder="$(PROFILE_PATH)"/>
+	</Target>
+
+	<Target Name="LaunchProfile" AfterTargets="AddToProfile" Condition="'$(Configuration)' == 'Launch'">
+		<Exec Command="$(LaunchCommand)"/>
+	</Target>
 </Project>
