@@ -8,7 +8,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 
-		<ThunderDeps>["BepInEx-BepInExPack-5.4.2100"]</ThunderDeps>
+		<ThunderDeps>["BepInEx-BepInExPack-5.4.2100", "AinaVT-LethalConfig-1.3.4"]</ThunderDeps>
 		<ThunderURL>https://github.com/AdalynBlack/LC-EnemyDebug</ThunderURL>
 
 		<LaunchCommand Condition="$(OS) == Windows_NT">&quot;$(LC_PATH)\Lethal Company.exe&quot; --doorstop-enable true --doorstop-target &quot;$(PROFILE_PATH)\..\core\BepInEx.Preloader.dll&quot;</LaunchCommand>
