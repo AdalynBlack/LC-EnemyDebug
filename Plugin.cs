@@ -23,8 +23,10 @@ public class EnemyDebug : BaseUnityPlugin
 		EnemyDebugConfig.BindAllTo(Config);
 
 		Harmony.CreateAndPatchAll(typeof(EnemyAIPatches));
+		Harmony.CreateAndPatchAll(typeof(FlowermanAIPatches));
 		Harmony.CreateAndPatchAll(typeof(SpringManPatches));
 		Harmony.CreateAndPatchAll(typeof(HoarderBugPatches));
+		Harmony.CreateAndPatchAll(typeof(MouthDogPatches));
 		Harmony.CreateAndPatchAll(typeof(StartOfRoundPatches));
 		Harmony.CreateAndPatchAll(typeof(HUDManagerPatches));
 		Harmony.CreateAndPatchAll(typeof(GizmoPatches));
