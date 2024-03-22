@@ -1,3 +1,4 @@
+using EnemyDebug.Config;
 using HarmonyLib;
 using UnityEngine;
 
@@ -16,6 +17,9 @@ public class StartOfRoundPatches
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch()
 	{
+		if(!EnemyDebugConfig.ShowPathingNodes.Value)
+			return;
+
 		foreach (var insideNode in RoundManager.Instance.insideAINodes)
 		{
 			GizmoPatches.DrawSphere(insideNode.transform.position, 0.25f, color: new Color(0.5f, 0.5f, 0.5f));

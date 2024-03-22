@@ -9,6 +9,9 @@ public class HoarderBugPatches
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch(HoarderBugAI __instance)
 	{
+		if(!__instance.debugEnemyAI)
+			return;
+
 		if(__instance.nestPosition == null)
 			return;
 

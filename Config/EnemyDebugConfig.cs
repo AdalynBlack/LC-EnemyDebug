@@ -10,37 +10,63 @@ public static class EnemyDebugConfig
 {
 	public static ConfigFile EnemyDebugFile;
 
-	internal static ConfigEntry<string> ValidEnemiesString;
+	// World
+	public static ConfigEntry<bool> ShowPathingNodes;
 
-	private static string lastEnemiesString = "";
+	// Search
+	public static ConfigEntry<bool> ShowSearchedNodes;
+	public static ConfigEntry<bool> ShowTargetedNode;
+	public static ConfigEntry<bool> ShowNextTargetNode;
 
-	private static List<string> _validEnemies;
-	public static List<string> ValidEnemies
-	{
-		get {
-			if(lastEnemiesString == ValidEnemiesString.Value)
-				return _validEnemies;
-			
-			lastEnemiesString = ValidEnemiesString.Value;
-			_validEnemies = lastEnemiesString.Split(", ").ToList();
+	// Misc
+	public static ConfigEntry<bool> ShouldDrawDefaultGizmos;
 
-			return _validEnemies;
-		}
-		private set {
-			EnemyDebug.HarmonyLog.LogDebug("Valid enemies list modification detected");
-			_validEnemies = value;
-		}
-	}
+	//Advanced
+	public static ConfigEntry<bool> ShouldDrawOrigin;
+
 
 	public static void BindAllTo(ConfigFile config)
 	{
 		EnemyDebugFile = config;
 
-		ValidEnemiesString = EnemyDebugFile.Bind<string>(
+		// World
+		ShowPathingNodes = EnemyDebugFile.Bind<bool>(
+				"World",
+				"Show Pathing Nodes",
+				false);
+
+		// Search
+		ShowSearchedNodes = EnemyDebugFile.Bind<bool>(
+				"Search",
+				"Show Searched Nodes",
+				false);
+
+		ShowTargetedNode = EnemyDebugFile.Bind<bool>(
+				"Search",
+				"Show Currently Targeted Node",
+				true);
+
+		ShowNextTargetNode = EnemyDebugFile.Bind<bool>(
+				"Search",
+				"Show Next Target Node",
+				false);
+
+		// Misc
+		ShouldDrawDefaultGizmos = EnemyDebugFile.Bind<bool>(
+				"Misc",
+				"Should Draw Default Gizmos?",
+				true);
+
+		// Advanced
+		ShouldDrawOrigin = EnemyDebugFile.Bind<bool>(
+				"Advanced",
+				"Should Draw Origin?",
+				false);
+
+		// Remove now unused value
+		EnemyDebugFile.Remove(EnemyDebugFile.Bind<string>(
 				"Enemies",
 				"Enemies to Debug",
-				"BaboonBirdAI, BlobAI, CentipedeAI, CrawlerAI, DressGirlAI, FlowermanAI, ForestGiantAI, HoarderBugAI, JesterAI, MaskedPlayerEnemy, MouthDogAI, NutcrakcerEnemyAI, PufferAI, SandSpiderAI, SandWormAI, SpringManAI",
-				new ConfigDescription(
-					"A comma separated list of enemies to enable debugging on. Allowed values are [BaboonBirdAI, BlobAI, CentipedeAI, CrawlerAI, DocileLocustBeesAI, DoublewingAI, DressGirlAI, FlowermanAI, ForestGiantAI, HoarderBugAI, JesterAI, LassoManAI, MaskedPlayerEnemy, MouthDogAI, NutcrakcerEnemyAI, PufferAI, RedLocustBees, SandSpiderAI, SandWormAI, SpringManAI, TestEnemy]"));
+				"").Definition);
 	}
 }

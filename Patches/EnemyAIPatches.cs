@@ -1,33 +1,74 @@
+using BepInEx.Configuration;
 using EnemyDebug.Config;
 using HarmonyLib;
+using LethalConfig;
+using LethalConfig.ConfigItems;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace EnemyDebug.Patches;
 
 public class EnemyAIPatches
 {
+	internal static Dictionary<string, ConfigEntry<bool>> EnemyConfigs = new Dictionary<string, ConfigEntry<bool>>();
+
 	[HarmonyPatch(typeof(EnemyAI), "Start")]
 	[HarmonyPostfix]
 	static void StartPostfixPatch(EnemyAI __instance)
 	{
-		string typeString = __instance.GetType().ToString();
-		bool shouldDebug = EnemyDebugConfig.ValidEnemies.Contains(typeString);
-		EnemyDebug.HarmonyLog.LogDebug($"Should {typeString} be debugged? {(shouldDebug ? "Yes" : "No")}");
-		__instance.debugEnemyAI = shouldDebug;
+		ConfigEntry<bool> entry = GetOrBindConfigEntry(__instance);
+		__instance.debugEnemyAI = entry.Value;
+
+		if(entry.Value)
+			EnemyDebug.HarmonyLog.LogDebug($"Newly added {__instance.enemyType.enemyName} is now being debugged");
+
+		EnemyConfigs[__instance.enemyType.enemyName] = entry;
+		entry.SettingChanged += (_obj, _args) =>
+		{
+			__instance.debugEnemyAI = entry.Value;
+			EnemyDebug.HarmonyLog.LogDebug($"{__instance.enemyType.enemyName} is now {(entry.Value ? "" : "no longer ")} being debugged");
+		};
+
+	}
+	
+	static ConfigEntry<bool> GetOrBindConfigEntry(EnemyAI __instance)
+	{
+		if(EnemyConfigs.ContainsKey(__instance.enemyType.enemyName))
+			return EnemyConfigs[__instance.enemyType.enemyName];
+
+		string enemyTypeString = "Inside";
+
+		if (__instance.enemyType.isDaytimeEnemy)
+			enemyTypeString = "Daytime";
+		else if (__instance.enemyType.isOutsideEnemy)
+			enemyTypeString = "Outside";
+
+		var settingPath = $"Enemies.{enemyTypeString}";
+		var settingName = $"{__instance.enemyType.enemyName}";
+
+		var entry = EnemyDebugConfig.EnemyDebugFile.Bind<bool>(
+				$"Enemies.{enemyTypeString}",
+				$"{__instance.enemyType.enemyName}",
+				false,
+				$"Enable debugging for this enemy");
+		
+		var checkbox = new BoolCheckBoxConfigItem(entry, requiresRestart: false);
+		LethalConfigManager.AddConfigItem(checkbox);
+		return entry;
 	}
 
 	[HarmonyPatch(typeof(EnemyAI), "Update")]
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch(EnemyAI __instance)
 	{
-		__instance.debugEnemyAI = EnemyDebugConfig.ValidEnemies.Contains(__instance.GetType().ToString());
-
-		if(!__instance.debugEnemyAI)
+		if (!__instance.debugEnemyAI)
 			return;
 
-		__instance.OnDrawGizmos();
+		if(EnemyDebugConfig.ShouldDrawDefaultGizmos.Value)
+			__instance.OnDrawGizmos();
 
-		GizmoPatches.DrawSphere(__instance.transform.position, 0.2f, color: new Color(1f, 0f, 0f));
+		if(EnemyDebugConfig.ShouldDrawOrigin.Value)
+			GizmoPatches.DrawSphere(__instance.transform.position, 0.2f, color: new Color(1f, 0f, 0f));
 
 		var nodeProps = __instance.GetComponentInChildren<ScanNodeProperties>();
 
@@ -49,10 +90,10 @@ public class EnemyAIPatches
 	private static void SearchDebug(EnemyAI __instance, ScanNodeProperties nodeProps)
 	{
 		var search = __instance.currentSearch;
-		if(search == null)
+		if (search == null)
 			return;
 
-		if(!search.inProgress)
+		if (!search.inProgress)
 		{
 			AlternateNodeProps(__instance, nodeProps);
 			return;
@@ -69,20 +110,29 @@ public class EnemyAIPatches
 		nodeProps.subText += $"Looping? {search.loopSearch}\n";
 		nodeProps.subText += $"Calculating node? {search.calculatingNodeInSearch}";
 		
-		foreach(var node in __instance.allAINodes)
+		if (EnemyDebugConfig.ShowSearchedNodes.Value)
 		{
-			if(search.unsearchedNodes.Contains(node))
-				continue;
+			foreach (var node in __instance.allAINodes)
+			{
+				if (search.unsearchedNodes.Contains(node))
+					continue;
 
-			GizmoPatches.DrawSphere(node.transform.position, .4f, color: new Color(0f, 1f, 0f));
+				GizmoPatches.DrawSphere(node.transform.position, .4f, color: new Color(0f, 1f, 0f));
+			}
 		}
 
-		if(search.currentTargetNode == null)
+		if (!EnemyDebugConfig.ShowTargetedNode.Value)
+			return;
+
+		if (search.currentTargetNode == null)
 			return;
 		GizmoPatches.DrawSphere(search.currentTargetNode.transform.position, 0.8f, color: new Color(1f, 1f, 0f, 0.5f));
 		GizmoPatches.DrawLine(__instance.transform.position, search.currentTargetNode.transform.position, color: new Color(0.7f, 0.7f, 0.2f, 0.5f));
 
-		if(search.nextTargetNode == null)
+		if (!EnemyDebugConfig.ShowNextTargetNode.Value)
+			return;
+
+		if (search.nextTargetNode == null)
 			return;
 		GizmoPatches.DrawSphere(search.nextTargetNode.transform.position, 0.5f, color: new Color(0f, 1f, 1f, 0.3f));
 		GizmoPatches.DrawLine(search.currentTargetNode.transform.position, search.nextTargetNode.transform.position, color: new Color(0.2f, 0.7f, 0.7f, 0.3f));

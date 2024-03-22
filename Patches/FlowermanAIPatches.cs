@@ -3,12 +3,15 @@ using UnityEngine;
 
 namespace EnemyDebug.Patches;
 
-public class FlowermanPatches
+public class FlowermanAIPatches
 {
 	[HarmonyPatch(typeof(FlowermanAI), "Update")]
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch(FlowermanAI __instance)
 	{
+		if(!__instance.debugEnemyAI)
+			return;
+
 		if(__instance.favoriteSpot == null)
 			return;
 
