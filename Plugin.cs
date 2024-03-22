@@ -27,8 +27,6 @@ public class EnemyDebug : BaseUnityPlugin
 		Harmony.CreateAndPatchAll(typeof(HoarderBugPatches));
 		Harmony.CreateAndPatchAll(typeof(StartOfRoundPatches));
 		Harmony.CreateAndPatchAll(typeof(HUDManagerPatches));
-		Harmony.CreateAndPatchAll(typeof(QuickMenuManagerPatches));
-		Harmony.CreateAndPatchAll(typeof(PlayerControllerBPatches));
 		Harmony.CreateAndPatchAll(typeof(GizmoPatches));
 
 		EnemyDebugDynamicConfig.RegisterDynamicConfig();
