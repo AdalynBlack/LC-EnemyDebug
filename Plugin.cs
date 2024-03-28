@@ -34,6 +34,7 @@ public class EnemyDebug : BaseUnityPlugin
 		Harmony.CreateAndPatchAll(typeof(HUDManagerPatches));
 		Harmony.CreateAndPatchAll(typeof(GizmoPatches));
 
+		Draw.RegisterModels();
 		EnemyDebugDynamicConfig.RegisterDynamicConfig();
 	}
 }

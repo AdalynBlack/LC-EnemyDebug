@@ -16,6 +16,6 @@ public class FlowermanAIPatches
 		if(__instance.favoriteSpot == null)
 			return;
 
-		GizmoPatches.DrawSphere(__instance.favoriteSpot.position, 1f, color: new Color(0f, 0f, 1f));
+		Draw.Sphere(__instance.favoriteSpot.position, 1f, color: new Color(0f, 0f, 1f));
 	}
 }

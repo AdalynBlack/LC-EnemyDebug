@@ -7,13 +7,6 @@ namespace EnemyDebug.Patches.World;
 [HarmonyPatch(typeof(StartOfRound))]
 public class StartOfRoundPatches
 {
-	[HarmonyPatch("Start")]
-	[HarmonyPostfix]
-	static void StartPostfixPatch()
-	{
-		GizmoPatches.registerModels();
-	}
-
 	[HarmonyPatch("Update")]
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch()
@@ -23,12 +16,12 @@ public class StartOfRoundPatches
 
 		foreach (var insideNode in RoundManager.Instance.insideAINodes)
 		{
-			GizmoPatches.DrawSphere(insideNode.transform.position, 0.25f, color: new Color(0.5f, 0.5f, 0.5f));
+			Draw.Sphere(insideNode.transform.position, 0.25f, color: new Color(0.5f, 0.5f, 0.5f));
 		}
 
 		foreach (var outsideNode in RoundManager.Instance.outsideAINodes)
 		{
-			GizmoPatches.DrawSphere(outsideNode.transform.position, 0.25f, color: new Color(0.5f, 0.5f, 0.5f));
+			Draw.Sphere(outsideNode.transform.position, 0.25f, color: new Color(0.5f, 0.5f, 0.5f));
 		}
 	}
 }

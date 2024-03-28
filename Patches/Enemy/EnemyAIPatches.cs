@@ -69,7 +69,7 @@ public class EnemyAIPatches
 			__instance.OnDrawGizmos();
 
 		if(EnemyDebugConfig.ShouldDrawOrigin.Value)
-			GizmoPatches.DrawSphere(__instance.transform.position, 0.2f, color: new Color(1f, 0f, 0f));
+			Draw.Sphere(__instance.transform.position, 0.2f, color: new Color(1f, 0f, 0f));
 
 		var nodeProps = __instance.GetComponentInChildren<ScanNodeProperties>();
 
@@ -118,7 +118,7 @@ public class EnemyAIPatches
 				if (search.unsearchedNodes.Contains(node))
 					continue;
 
-				GizmoPatches.DrawSphere(node.transform.position, .4f, color: new Color(0f, 1f, 0f));
+				Draw.Sphere(node.transform.position, .4f, color: new Color(0f, 1f, 0f));
 			}
 		}
 
@@ -127,15 +127,15 @@ public class EnemyAIPatches
 
 		if (search.currentTargetNode == null)
 			return;
-		GizmoPatches.DrawSphere(search.currentTargetNode.transform.position, 0.8f, color: new Color(1f, 1f, 0f, 0.5f));
-		GizmoPatches.DrawLine(__instance.transform.position, search.currentTargetNode.transform.position, color: new Color(0.7f, 0.7f, 0.2f, 0.5f));
+		Draw.Sphere(search.currentTargetNode.transform.position, 0.8f, color: new Color(1f, 1f, 0f, 0.5f));
+		Draw.Line(__instance.transform.position, search.currentTargetNode.transform.position, color: new Color(0.7f, 0.7f, 0.2f, 0.5f));
 
 		if (!EnemyDebugConfig.ShowNextTargetNode.Value)
 			return;
 
 		if (search.nextTargetNode == null)
 			return;
-		GizmoPatches.DrawSphere(search.nextTargetNode.transform.position, 0.5f, color: new Color(0f, 1f, 1f, 0.3f));
-		GizmoPatches.DrawLine(search.currentTargetNode.transform.position, search.nextTargetNode.transform.position, color: new Color(0.2f, 0.7f, 0.7f, 0.3f));
+		Draw.Sphere(search.nextTargetNode.transform.position, 0.5f, color: new Color(0f, 1f, 1f, 0.3f));
+		Draw.Line(search.currentTargetNode.transform.position, search.nextTargetNode.transform.position, color: new Color(0.2f, 0.7f, 0.7f, 0.3f));
 	}
 }
