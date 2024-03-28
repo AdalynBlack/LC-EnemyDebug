@@ -4,16 +4,17 @@ using UnityEngine;
 
 namespace EnemyDebug.Patches;
 
+[HarmonyPatch(typeof(StartOfRound))]
 public class StartOfRoundPatches
 {
-	[HarmonyPatch(typeof(StartOfRound), "Start")]
+	[HarmonyPatch("Start")]
 	[HarmonyPostfix]
 	static void StartPostfixPatch()
 	{
 		GizmoPatches.registerModels();
 	}
 
-	[HarmonyPatch(typeof(StartOfRound), "Update")]
+	[HarmonyPatch("Update")]
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch()
 	{

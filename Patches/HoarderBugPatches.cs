@@ -3,9 +3,10 @@ using UnityEngine;
 
 namespace EnemyDebug.Patches;
 
+[HarmonyPatch(typeof(HoarderBugAI))]
 public class HoarderBugPatches
 {
-	[HarmonyPatch(typeof(HoarderBugAI), "Update")]
+	[HarmonyPatch("Update")]
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch(HoarderBugAI __instance)
 	{

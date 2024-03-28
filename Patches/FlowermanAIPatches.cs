@@ -3,9 +3,10 @@ using UnityEngine;
 
 namespace EnemyDebug.Patches;
 
+[HarmonyPatch(typeof(FlowermanAI))]
 public class FlowermanAIPatches
 {
-	[HarmonyPatch(typeof(FlowermanAI), "Update")]
+	[HarmonyPatch("Update")]
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch(FlowermanAI __instance)
 	{

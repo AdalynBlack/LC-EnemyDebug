@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace EnemyDebug.Patches;
 
+[HarmonyPatch(typeof(Gizmos))]
 public class GizmoPatches
 {
 	private static Mesh sphere;
@@ -27,7 +28,7 @@ public class GizmoPatches
 		debugRenderParams = new RenderParams(material) {matProps = matProps};
 	}
 
-	[HarmonyPatch(typeof(Gizmos), "DrawSphere")]
+	[HarmonyPatch("DrawSphere")]
 	[HarmonyPostfix]
 	public static void DrawSpherePatch(Vector3 center, float radius)
 	{
@@ -47,7 +48,7 @@ public class GizmoPatches
 					new Vector3(radius * 2, radius * 2, radius * 2)));
 	}
 
-	[HarmonyPatch(typeof(Gizmos), "DrawCube")]
+	[HarmonyPatch("DrawCube")]
 	[HarmonyPostfix]
 	public static void DrawCubePatch(Vector3 center, Vector3 size)
 	{
@@ -67,7 +68,7 @@ public class GizmoPatches
 					size));
 	}
 
-	[HarmonyPatch(typeof(Gizmos), "DrawLine")]
+	[HarmonyPatch("DrawLine")]
 	[HarmonyPostfix]
 	public static void DrawLinePatch(Vector3 from, Vector3 to)
 	{

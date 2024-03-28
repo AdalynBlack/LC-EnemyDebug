@@ -3,9 +3,10 @@ using UnityEngine;
 
 namespace EnemyDebug.Patches;
 
+[HarmonyPatch(typeof(MouthDogAI))]
 public class MouthDogPatches
 {
-	[HarmonyPatch(typeof(MouthDogAI), "OnDrawGizmos")]
+	[HarmonyPatch("OnDrawGizmos")]
 	[HarmonyPrefix]
 	static bool OnDrawGizmosPrefixPatch(MouthDogAI __instance)
 	{

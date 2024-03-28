@@ -3,9 +3,10 @@ using UnityEngine;
 
 namespace EnemyDebug.Patches;
 
+[HarmonyPatch(typeof(SpringManAI))]
 public class SpringManPatches
 {
-	[HarmonyPatch(typeof(SpringManAI), "Update")]
+	[HarmonyPatch("Update")]
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch(SpringManAI __instance)
 	{

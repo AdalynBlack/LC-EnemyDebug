@@ -8,11 +8,12 @@ using UnityEngine;
 
 namespace EnemyDebug.Patches;
 
+[HarmonyPatch(typeof(EnemyAI))]
 public class EnemyAIPatches
 {
 	internal static Dictionary<string, ConfigEntry<bool>> EnemyConfigs = new Dictionary<string, ConfigEntry<bool>>();
 
-	[HarmonyPatch(typeof(EnemyAI), "Start")]
+	[HarmonyPatch("Start")]
 	[HarmonyPostfix]
 	static void StartPostfixPatch(EnemyAI __instance)
 	{
@@ -57,7 +58,7 @@ public class EnemyAIPatches
 		return entry;
 	}
 
-	[HarmonyPatch(typeof(EnemyAI), "Update")]
+	[HarmonyPatch("Update")]
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch(EnemyAI __instance)
 	{

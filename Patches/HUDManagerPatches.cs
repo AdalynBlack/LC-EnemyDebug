@@ -6,9 +6,10 @@ using UnityEngine.UI;
 
 namespace EnemyDebug.Patches;
 
+[HarmonyPatch(typeof(HUDManager))]
 public class HUDManagerPatches
 {
-	[HarmonyPatch(typeof(HUDManager), "NodeIsNotVisible")]
+	[HarmonyPatch("NodeIsNotVisible")]
 	[HarmonyPrefix]
 	static bool NodeVisibilityPatch(HUDManager __instance, ScanNodeProperties node, int elementIndex, ref bool __result)
 	{
@@ -37,7 +38,7 @@ public class HUDManagerPatches
 		return false;
 	}
 
-	[HarmonyPatch(typeof(HUDManager), "PingScan_performed")]
+	[HarmonyPatch("PingScan_performed")]
 	[HarmonyPrefix]
 	static void PingScanClearNodes(HUDManager __instance)
 	{
