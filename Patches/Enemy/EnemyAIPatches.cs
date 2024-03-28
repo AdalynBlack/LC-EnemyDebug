@@ -6,7 +6,7 @@ using LethalConfig.ConfigItems;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EnemyDebug.Patches;
+namespace EnemyDebug.Patches.Enemy;
 
 [HarmonyPatch(typeof(EnemyAI))]
 public class EnemyAIPatches

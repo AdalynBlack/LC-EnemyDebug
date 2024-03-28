@@ -1,6 +1,9 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using EnemyDebug.Patches;
+using EnemyDebug.Patches.Enemy;
+using EnemyDebug.Patches.UI;
+using EnemyDebug.Patches.World;
 using EnemyDebug.Config;
 using HarmonyLib;
 

@@ -2,7 +2,7 @@ using EnemyDebug.Config;
 using HarmonyLib;
 using UnityEngine;
 
-namespace EnemyDebug.Patches;
+namespace EnemyDebug.Patches.World;
 
 [HarmonyPatch(typeof(StartOfRound))]
 public class StartOfRoundPatches

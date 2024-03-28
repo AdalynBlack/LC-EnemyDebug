@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EnemyDebug.Patches;
+namespace EnemyDebug.Patches.UI;
 
 [HarmonyPatch(typeof(HUDManager))]
 public class HUDManagerPatches

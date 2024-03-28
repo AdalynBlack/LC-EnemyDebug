@@ -1,7 +1,7 @@
 using HarmonyLib;
 using UnityEngine;
 
-namespace EnemyDebug.Patches;
+namespace EnemyDebug.Patches.Enemy;
 
 [HarmonyPatch(typeof(HoarderBugAI))]
 public class HoarderBugPatches
