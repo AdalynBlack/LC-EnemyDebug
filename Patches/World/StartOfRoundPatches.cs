@@ -7,6 +7,13 @@ namespace EnemyDebug.Patches.World;
 [HarmonyPatch(typeof(StartOfRound))]
 public class StartOfRoundPatches
 {
+	[HarmonyPatch("Start")]
+	[HarmonyPostfix]
+	static void InjectDrawStart(StartOfRound __instance)
+	{
+		Draw.RegisterMeshes();
+	}
+
 	[HarmonyPatch("Update")]
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch()
@@ -23,5 +30,6 @@ public class StartOfRoundPatches
 		{
 			Draw.Sphere(outsideNode.transform.position, 0.25f, color: new Color(0.5f, 0.5f, 0.5f));
 		}
+		Draw.DrawAll();
 	}
 }

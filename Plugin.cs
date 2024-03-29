@@ -27,14 +27,17 @@ public class EnemyDebug : BaseUnityPlugin
 
 		Harmony.CreateAndPatchAll(typeof(EnemyAIPatches));
 		Harmony.CreateAndPatchAll(typeof(FlowermanAIPatches));
-		Harmony.CreateAndPatchAll(typeof(SpringManPatches));
 		Harmony.CreateAndPatchAll(typeof(HoarderBugPatches));
 		Harmony.CreateAndPatchAll(typeof(MouthDogPatches));
+		Harmony.CreateAndPatchAll(typeof(SpringManPatches));
+
 		Harmony.CreateAndPatchAll(typeof(StartOfRoundPatches));
+
 		Harmony.CreateAndPatchAll(typeof(HUDManagerPatches));
+
+		Harmony.CreateAndPatchAll(typeof(DebugPatches));
 		Harmony.CreateAndPatchAll(typeof(GizmoPatches));
 
-		Draw.RegisterModels();
 		EnemyDebugDynamicConfig.RegisterDynamicConfig();
 	}
 }
