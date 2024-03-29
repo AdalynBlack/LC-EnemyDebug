@@ -4,6 +4,7 @@ using HarmonyLib;
 using LethalConfig;
 using LethalConfig.ConfigItems;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace EnemyDebug.Patches.Enemy;
@@ -65,7 +66,15 @@ public class EnemyAIPatches
 		// Inform the debug patch that all draw calls are currently from an enemy
 		DebugPatches.SetEnemy(true);
 		DebugPatches.SetEnemyDebug(__instance.debugEnemyAI);
+
+		HeaderTextBuilder = new StringBuilder();
+		SubTextBuilder = new StringBuilder();
+
+		HeaderTextBuilder.Append($"{__instance.enemyType.enemyName}: ");
 	}
+
+	public static StringBuilder HeaderTextBuilder = new StringBuilder();
+	public static StringBuilder SubTextBuilder = new StringBuilder();
 
 	[HarmonyPatch("Update")]
 	[HarmonyPostfix]
@@ -90,56 +99,73 @@ public class EnemyAIPatches
 		nodeProps.maxRange = 120;
 		nodeProps.minRange = 0;
 		nodeProps.requiresLineOfSight = false;
-		nodeProps.headerText = $"{__instance.GetType().ToString()}: ";
 
-		SearchDebug(__instance, nodeProps);
+		ApplyStrings(__instance, nodeProps);
 	}
 
-	private static void AlternateNodeProps(EnemyAI __instance, ScanNodeProperties nodeProps)
+	private static void ApplyStrings(EnemyAI __instance, ScanNodeProperties nodeProps)
 	{
-		nodeProps.headerText += "Current State";
-		nodeProps.subText = $"{__instance.currentBehaviourStateIndex}";
+		string subtext = SubTextBuilder.ToString();
+		if (subtext == "")
+			ApplyDefaultStrings(__instance);
+
+		nodeProps.headerText = HeaderTextBuilder.ToString();
+		nodeProps.subText = SubTextBuilder.ToString();
 	}
 
-	private static void SearchDebug(EnemyAI __instance, ScanNodeProperties nodeProps)
+	private static void ApplyDefaultStrings(EnemyAI __instance)
+	{
+		if (!ApplySearchStrings(__instance))
+			ApplyStateStrings(__instance);
+	}
+
+	private static void ApplyStateStrings(EnemyAI __instance)
+	{
+		HeaderTextBuilder.Append("Current State");
+		SubTextBuilder.Append($"{__instance.currentBehaviourStateIndex}");
+	}
+
+	private static bool ApplySearchStrings(EnemyAI __instance)
 	{
 		var search = __instance.currentSearch;
+
 		if (search == null)
-			return;
+			return false;
 
 		if (!search.inProgress)
-		{
-			AlternateNodeProps(__instance, nodeProps);
-			return;
-		}
+			return false;
 
-		nodeProps.headerText += "Searching";
-		nodeProps.subText = $"{search.nodesEliminatedInCurrentSearch}/{__instance.allAINodes.Length} nodes searched\n";
-		nodeProps.subText += $"Search width: {search.searchWidth}\n";
-		nodeProps.subText += $"Search precision: {search.searchPrecision}\n";
-		nodeProps.subText += $"Has finished {search.timesFinishingSearch} times\n";
-		nodeProps.subText += $"Randomized? {search.randomized}\n";
-		nodeProps.subText += $"Waiting for target? {search.waitingForTargetNode}\n";
-		nodeProps.subText += $"Target chosen? {search.choseTargetNode}\n";
-		nodeProps.subText += $"Looping? {search.loopSearch}\n";
-		nodeProps.subText += $"Calculating node? {search.calculatingNodeInSearch}";
+		HeaderTextBuilder.Append("Searching");
+
+		SubTextBuilder
+			.AppendLine($"{search.nodesEliminatedInCurrentSearch}/{__instance.allAINodes.Length} nodes searched")
+			.AppendLine($"Search width: {search.searchWidth}")
+			.AppendLine($"Search precision: {search.searchPrecision}")
+			.AppendLine($"Has finished {search.timesFinishingSearch} times")
+			.AppendLine($"Randomized? {search.randomized}")
+			.AppendLine($"Waiting for target? {search.waitingForTargetNode}")
+			.AppendLine($"Target chosen? {search.choseTargetNode}")
+			.AppendLine($"Looping? {search.loopSearch}")
+			.Append($"Calculating node? {search.calculatingNodeInSearch}");
 		
-		if (EnemyDebugConfig.ShowSearchedNodes.Value)
-		{
-			foreach (var node in __instance.allAINodes)
-			{
-				if (search.unsearchedNodes.Contains(node))
-					continue;
+		DrawSearchGizmos(__instance);
 
-				Draw.Sphere(node.transform.position, .4f, color: new Color(0f, 1f, 0f));
-			}
-		}
+		return true;
+	}
+
+	private static void DrawSearchGizmos(EnemyAI __instance)
+	{
+		if (EnemyDebugConfig.ShowSearchedNodes.Value)
+			DrawSearchedNodes(__instance);
 
 		if (!EnemyDebugConfig.ShowTargetedNode.Value)
 			return;
 
+		var search = __instance.currentSearch;
+
 		if (search.currentTargetNode == null)
 			return;
+
 		Draw.Sphere(search.currentTargetNode.transform.position, 0.8f, color: new Color(1f, 1f, 0f, 0.5f));
 		Draw.Line(__instance.transform.position, search.currentTargetNode.transform.position, color: new Color(0.7f, 0.7f, 0.2f, 0.5f));
 
@@ -150,5 +176,16 @@ public class EnemyAIPatches
 			return;
 		Draw.Sphere(search.nextTargetNode.transform.position, 0.5f, color: new Color(0f, 1f, 1f, 0.3f));
 		Draw.Line(search.currentTargetNode.transform.position, search.nextTargetNode.transform.position, color: new Color(0.2f, 0.7f, 0.7f, 0.3f));
+	}
+
+	private static void DrawSearchedNodes(EnemyAI __instance)
+	{
+		foreach (var node in __instance.allAINodes)
+		{
+			if (__instance.currentSearch.unsearchedNodes.Contains(node))
+				continue;
+
+			Draw.Sphere(node.transform.position, .4f, color: new Color(0f, 1f, 0f));
+		}
 	}
 }
