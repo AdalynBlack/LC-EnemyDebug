@@ -35,8 +35,6 @@ public static class Draw
 	{
 		foreach (Color color in SphereData.Keys)
 		{
-			EnemyDebug.HarmonyLog.LogDebug($"Drawing {SphereData[color].Count} spheres in ({color})");
-
 			MaterialProperties.SetColor("_UnlitColor", color);
 
 			foreach (RenderData data in SphereData[color])
@@ -53,8 +51,6 @@ public static class Draw
 
 		foreach (Color color in CubeData.Keys)
 		{
-			EnemyDebug.HarmonyLog.LogDebug($"Drawing {CubeData[color].Count} cubes in ({color})");
-
 			MaterialProperties.SetColor("_UnlitColor", color);
 
 			foreach (RenderData data in CubeData[color])
