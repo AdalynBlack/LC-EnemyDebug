@@ -59,9 +59,22 @@ public class EnemyAIPatches
 	}
 
 	[HarmonyPatch("Update")]
+	[HarmonyPrefix]
+	static void UpdatePrefixPatch(EnemyAI __instance)
+	{
+		// Inform the debug patch that all draw calls are currently from an enemy
+		DebugPatches.SetEnemy(true);
+		DebugPatches.SetEnemyDebug(__instance.debugEnemyAI);
+	}
+
+	[HarmonyPatch("Update")]
 	[HarmonyPostfix]
 	static void UpdatePostfixPatch(EnemyAI __instance)
 	{
+		// Inform the debug patch that all draw calls are no longer from an enemy
+		DebugPatches.SetEnemy(false);
+		DebugPatches.SetEnemyDebug(false);
+
 		if (!__instance.debugEnemyAI)
 			return;
 

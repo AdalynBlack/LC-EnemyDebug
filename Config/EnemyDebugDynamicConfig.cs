@@ -14,6 +14,7 @@ internal static class EnemyDebugDynamicConfig
 
 		AddConfigItems(new BaseConfigItem[] {
 				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShowPathingNodes, requiresRestart: false),
+				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShouldDrawWorldGizmos, requiresRestart: false),
 				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShowSearchedNodes, requiresRestart: false),
 				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShowTargetedNode, requiresRestart: false),
 				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShowNextTargetNode, requiresRestart: false),

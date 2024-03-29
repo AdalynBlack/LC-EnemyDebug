@@ -12,6 +12,7 @@ public static class EnemyDebugConfig
 
 	// World
 	public static ConfigEntry<bool> ShowPathingNodes;
+	public static ConfigEntry<bool> ShouldDrawWorldGizmos;
 
 	// Search
 	public static ConfigEntry<bool> ShowSearchedNodes;
@@ -33,6 +34,11 @@ public static class EnemyDebugConfig
 		ShowPathingNodes = EnemyDebugFile.Bind<bool>(
 				"World",
 				"Show Pathing Nodes",
+				false);
+
+		ShouldDrawWorldGizmos = EnemyDebugFile.Bind<bool>(
+				"World",
+				"Should Draw Default World Gizmos",
 				false);
 
 		// Search
