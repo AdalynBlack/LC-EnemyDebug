@@ -66,7 +66,7 @@
 		<Exec Command="zip &quot;$(Product)Thunderstore.zip&quot; CHANGELOG.md"/>
 	</Target>
 
-	<Target Name="AddToProfile" AfterTargets="Build">
+	<Target Name="AddToProfile" AfterTargets="Build" Condition="'$(PROFILE_PATH)' != ''">
 		<Message Text="Copying Compiled Mod $(Product) to Profile Plugins Folder" Importance="High"/>
 		<Copy SourceFiles="bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).dll" DestinationFolder="$(PROFILE_PATH)"/>
 	</Target>
