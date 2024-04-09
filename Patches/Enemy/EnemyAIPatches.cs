@@ -3,7 +3,10 @@ using EnemyDebug.Config;
 using HarmonyLib;
 using LethalConfig;
 using LethalConfig.ConfigItems;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -18,6 +21,7 @@ public class EnemyAIPatches
 	[HarmonyPostfix]
 	static void StartPostfixPatch(EnemyAI __instance)
 	{
+
 		ConfigEntry<bool> entry = GetOrBindConfigEntry(__instance);
 		__instance.debugEnemyAI = entry.Value;
 
@@ -30,7 +34,6 @@ public class EnemyAIPatches
 			__instance.debugEnemyAI = entry.Value;
 			EnemyDebug.HarmonyLog.LogDebug($"{__instance.enemyType.enemyName} is now {(entry.Value ? "" : "no longer ")} being debugged");
 		};
-
 	}
 	
 	static ConfigEntry<bool> GetOrBindConfigEntry(EnemyAI __instance)
@@ -45,18 +48,42 @@ public class EnemyAIPatches
 		else if (__instance.enemyType.isOutsideEnemy)
 			enemyTypeString = "Outside";
 
-		var settingPath = $"Enemies.{enemyTypeString}";
-		var settingName = $"{__instance.enemyType.enemyName}";
+		var settingPath = $"Enemies.{enemyTypeString}.{__instance.enemyType.enemyName}";
 
-		var entry = EnemyDebugConfig.EnemyDebugFile.Bind<bool>(
-				$"Enemies.{enemyTypeString}",
-				$"{__instance.enemyType.enemyName}",
+		var enabledEntry = EnemyDebugConfig.EnemyDebugFile.Bind<bool>(
+				settingPath,
+				"Enabled",
 				false,
-				$"Enable debugging for this enemy");
-		
-		var checkbox = new BoolCheckBoxConfigItem(entry, requiresRestart: false);
+				"Enable debugging for this enemy");
+
+		var checkbox = new BoolCheckBoxConfigItem(enabledEntry, requiresRestart: false);
 		LethalConfigManager.AddConfigItem(checkbox);
-		return entry;
+
+		var debugValuesEntry = EnemyDebugConfig.EnemyDebugFile.Bind<string>(
+				settingPath,
+				"Debug Values",
+				"",
+				"Values to debug for this enemy");
+
+		debugValuesEntry.SettingChanged += (_obj, _args ) => ChangeDebugValues(__instance.enemyType.enemyName, debugValuesEntry);
+
+		var list = new TextInputFieldConfigItem(debugValuesEntry, requiresRestart: false);
+		LethalConfigManager.AddConfigItem(list);
+
+		return enabledEntry;
+	}
+
+	internal static Dictionary<string, List<string>> DebugValues;
+	static void ChangeDebugValues(string enemyName, ConfigEntry<string> entry)
+	{
+		if (DebugValues == null)
+			DebugValues = new Dictionary<string, List<string>>();
+
+		DebugValues[enemyName] = new List<string>();
+
+		var fields = entry.Value.Split(',');
+		foreach (var field in fields)
+			DebugValues[enemyName].Add(field);
 	}
 
 	[HarmonyPatch("Update")]
@@ -108,6 +135,26 @@ public class EnemyAIPatches
 		string subtext = SubTextBuilder.ToString();
 		if (subtext == "")
 			ApplyDefaultStrings(__instance);
+
+		DebugValues.TryGetValue(__instance.enemyType.enemyName, out var fields);
+		if (fields != null)
+			foreach (var field in fields)
+			{
+				var fieldInfo = __instance.GetType().GetField(field, BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance);
+				var fieldValue = fieldInfo.GetValue(__instance);
+				var fieldString = fieldValue.ToString();
+
+				// For arrays, lists, etc, use String.Join() instead of Object.ToString()
+				if (typeof(System.Object[]).IsAssignableFrom(fieldValue.GetType()))
+					fieldString = String.Join(", ", fieldValue as System.Object[]);
+				if (typeof(IEnumerable).IsAssignableFrom(fieldValue.GetType()))
+					fieldString = String.Join(", ", fieldValue as IEnumerable);
+
+				SubTextBuilder.Append(fieldInfo.ToString())
+					.Append(fieldInfo.FieldType.IsSubclassOf(typeof(bool)) ? "? " : ": ")
+					.Append(fieldInfo.GetValue(__instance).ToString())
+					.Append("\n");
+			}
 
 		nodeProps.headerText = HeaderTextBuilder.ToString();
 		nodeProps.subText = SubTextBuilder.ToString();
