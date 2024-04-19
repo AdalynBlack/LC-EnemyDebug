@@ -33,36 +33,34 @@ public static class Draw
 
 	public static void DrawAll()
 	{
-		foreach (Color color in SphereData.Keys)
+		DrawAs(SphereData, SphereMesh);
+		DrawAs(CubeData, CubeMesh);
+
+		foreach (float angle in ConeData.Keys)
 		{
-			MaterialProperties.SetColor("_UnlitColor", color);
-
-			foreach (RenderData data in SphereData[color])
-			{
-				Graphics.RenderMesh(DebugRenderParams, SphereMesh, 0, data.objectToWorld);
-			}
-
-			// For some reason, this doesn't work. Unity docs say it should, but it doesn't
-			//Graphics.RenderMeshInstanced(DebugRenderParams, SphereMesh, 0, SphereData[color].ToArray());
-
-			SphereData[color].RemoveAll(data => data.duration <= 0f);
-			SphereData[color].ForEach(data => data.Decrement(Time.deltaTime));
+			EnemyDebug.HarmonyLog.LogDebug($"Drawing cones of angle {angle}");
+			DrawAs(ConeData[angle], ConeMesh[angle]);
 		}
+	}
 
-		foreach (Color color in CubeData.Keys)
+	private static void DrawAs(Dictionary<Color, List<RenderData>> data, Mesh mesh)
+	{
+		foreach (Color color in data.Keys)
 		{
-			MaterialProperties.SetColor("_UnlitColor", color);
+			MaterialProperties.SetColor("_BaseColor", color);
+			MaterialProperties.SetColor("_Color", color);
+			MaterialProperties.SetColor("_EmissiveColor", color);
 
-			foreach (RenderData data in CubeData[color])
+			foreach (RenderData datum in data[color])
 			{
-				Graphics.RenderMesh(DebugRenderParams, CubeMesh, 0, data.objectToWorld);
+				Graphics.RenderMesh(DebugRenderParams, mesh, 0, datum.objectToWorld);
 			}
 
 			// For some reason, this doesn't work. Unity docs say it should, but it doesn't
-			//Graphics.RenderMeshInstanced(DebugRenderParams, CubeMesh, 0, CubeData[color].ToArray());
+			//Graphics.RenderMeshInstanced(DebugRenderParams, mesh, 0, data[color].ToArray());
 
-			CubeData[color].RemoveAll(data => data.duration <= 0f);
-			CubeData[color].ForEach(data => data.Decrement(Time.deltaTime));
+			data[color].RemoveAll(datum => datum.duration <= 0f);
+			data[color].ForEach(datum => datum.Decrement(Time.deltaTime));
 		}
 	}
 
@@ -126,6 +124,124 @@ public static class Draw
 					new Vector3(.2f, .2f, length)),
 				duration = duration,
 				depthTest = depthTest});
+	}
+
+	private static Dictionary<float, Dictionary<Color, List<RenderData>>> ConeData = new Dictionary<float, Dictionary<Color, List<RenderData>>>();
+	private static Dictionary<float, Mesh> ConeMesh = new Dictionary<float, Mesh>();
+
+	public static void Cone(Vector3 start, Vector3 end, Color? color = null, float angle = 1.0f, float duration = 0.0f, bool depthTest = true)
+	{
+		Color setColor = color ?? Color.green;
+
+		var offset = end - start;
+		var length = offset.magnitude;
+
+		if(length <= 0)
+			return;
+
+		ConeData.TryGetValue(angle, out var data);
+		if (data == null)
+		{
+			ConeData[angle] = data = new Dictionary<Color, List<RenderData>>();
+			ConeMesh[angle] = GenerateCone(angle);
+		}
+
+		data.TryGetValue(setColor, out var dataList);
+		if (dataList == null)
+		{
+			ConeData[angle][setColor] = new List<RenderData>();
+		}
+
+		var lookRotation = Quaternion.LookRotation(offset);
+		ConeData[angle][setColor].Add(new RenderData {
+				objectToWorld = Matrix4x4.TRS(
+					start,
+					lookRotation,
+					new Vector3(length, length, length)),
+				duration = duration,
+				depthTest = depthTest});
+	}
+
+	const float SPHERE_RINGS_COUNT = 32f;
+	const float SPHERE_LINES_COUNT = 32f;
+
+	public static Mesh GenerateCone(float angle)
+	{
+		Mesh coneMesh = new Mesh();
+
+		// Ring count has to be 2 or higher or it breaks because I don't get paid enough to fix it :D
+		int ringsCount = Mathf.Max(2, (int)(SPHERE_RINGS_COUNT*(angle/360f)) + 1);
+		int vertCount = ringsCount * (int)SPHERE_LINES_COUNT + 2;
+		Vector3[] verts = new Vector3[vertCount];
+		int[] indices = new int[6 * ((ringsCount + 1) * (int)SPHERE_LINES_COUNT)];
+
+		EnemyDebug.HarmonyLog.LogDebug($"Generating new cone with {ringsCount} rings and {vertCount} vertices");
+
+		// Set the centers of both ends of the cone
+		verts[0] = new Vector3(0f, 0f, 1f);
+		verts[vertCount - 1] = new Vector3(0f, 0f, 0f);
+
+		for (int ring = 1; ring < (ringsCount + 1); ring++)
+		{
+			// Figure out where in the array to edit for this ring
+			int vertOffset = (ring - 1) * (int)SPHERE_LINES_COUNT + 1;
+
+			// Figure out the distance and size of the vertex ring
+			float ringAngle = Mathf.Deg2Rad * angle * ((float)ring / ringsCount) / 2f;
+			float ringDistance = Mathf.Cos(ringAngle);
+			float ringSize = Mathf.Sin(ringAngle);
+
+			for (int vert = 0; vert < SPHERE_LINES_COUNT; vert++)
+			{
+				// Find the angle of this vertex
+				float vertAngle = -2 * Mathf.PI * (vert / SPHERE_LINES_COUNT);
+
+				// Get the exact index to modify for this vertex
+				int currentVert = vertOffset + vert;
+				verts[currentVert] = new Vector3(Mathf.Cos(vertAngle), Mathf.Sin(vertAngle), ringDistance / ringSize) * ringSize;
+
+				// Get the index in the indices array to modify for this vertex
+				int indexOffset = 6 * vertOffset + (vert * 6) - (3 * (int)SPHERE_LINES_COUNT);
+
+				// Precalcualte the next vertex in the ring, accounting for wrapping
+				var nextVert = (int)(vertOffset + ((vert + 1) % SPHERE_LINES_COUNT));
+
+				// If we're not on the first ring (yes I started at 1 to make the math easier)
+				// Draw the triangles for the quad
+				if (ring != 1)
+				{
+					indices[indexOffset] = currentVert - (int)SPHERE_LINES_COUNT;
+					indices[indexOffset + 1] = nextVert;
+					indices[indexOffset + 2] = currentVert;
+					indices[indexOffset + 3] = nextVert - (int)SPHERE_LINES_COUNT;
+					indices[indexOffset + 4] = nextVert;
+					indices[indexOffset + 5] = currentVert - (int)SPHERE_LINES_COUNT;
+				} else {
+					// We're on ring 1, offset our index to use 3 indices instead of 6 so we can use tris
+					indexOffset += 3 * (int)SPHERE_LINES_COUNT;
+					indexOffset /= 2;
+					// Connect to first index if we're on the innermost ring
+					indices[indexOffset] = 0;
+					indices[indexOffset + 1] = nextVert;
+					indices[indexOffset + 2] = currentVert;
+				}
+
+				if (ring == ringsCount)
+				{
+					// Go forwards one layer if we're on the last ring
+					indexOffset += (int)SPHERE_LINES_COUNT * 6;
+					// Connect to last index if we're on the outermost ring
+					indices[indexOffset] = vertCount - 1;
+					indices[indexOffset + 1] = currentVert;
+					indices[indexOffset + 2] = nextVert;
+				}
+			}
+		}
+
+		coneMesh.SetVertices(verts.ToList());
+		coneMesh.SetIndices(indices.ToList(), MeshTopology.Triangles, 0);
+
+		return coneMesh;
 	}
 
 	public class RenderData
