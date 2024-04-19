@@ -13,7 +13,7 @@ public static class Draw
 	private static MaterialPropertyBlock MaterialProperties;
 	private static RenderParams DebugRenderParams;
 
-	public static void RegisterMeshes()
+	public static void RegisterMeshes(Material mat)
 	{
 		var sphereObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 		SphereMesh = Object.Instantiate(sphereObject.GetComponent<MeshFilter>().mesh);
@@ -23,9 +23,11 @@ public static class Draw
 		CubeMesh = Object.Instantiate(cubeObject.GetComponent<MeshFilter>().mesh);
 		GameObject.Destroy(cubeObject);
 
-		var material = new Material(Shader.Find("HDRP/Unlit"));
+		var material = Object.Instantiate(mat);
 		material.enableInstancing = true;
-		material.renderQueue = 3000;
+		material.SetTexture("_BaseColorMap", null);
+		material.SetTexture("_MainTex", null);
+		material.SetTexture("_NormalMap", null);
 
 		MaterialProperties = new MaterialPropertyBlock();
 		DebugRenderParams = new RenderParams(material) {matProps = MaterialProperties};

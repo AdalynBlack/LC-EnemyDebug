@@ -9,9 +9,10 @@ public class StartOfRoundPatches
 {
 	[HarmonyPatch("Start")]
 	[HarmonyPostfix]
-	static void InjectDrawStart(StartOfRound __instance)
+	static void InjectDrawStart()
 	{
-		Draw.RegisterMeshes();
+		var trigger = Object.FindAnyObjectByType<OutOfBoundsTrigger>();
+		Draw.RegisterMeshes(trigger.GetComponent<MeshRenderer>().material);
 	}
 
 	[HarmonyPatch("Update")]
