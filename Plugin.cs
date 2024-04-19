@@ -18,18 +18,19 @@ public class EnemyDebug : BaseUnityPlugin
 	private void Awake()
 	{
 		// Plugin startup logic
-		Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+		Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loading...");
 
 		// I prepended spaces because I hate having it right next to the colon in logs lol
 		HarmonyLog = BepInEx.Logging.Logger.CreateLogSource(" EnemyDebug(Harmony)");
 
 		EnemyDebugConfig.BindAllTo(Config);
 
-		Harmony.CreateAndPatchAll(typeof(EnemyAIPatches));
 		Harmony.CreateAndPatchAll(typeof(FlowermanAIPatches));
 		Harmony.CreateAndPatchAll(typeof(HoarderBugPatches));
 		Harmony.CreateAndPatchAll(typeof(MouthDogPatches));
 		Harmony.CreateAndPatchAll(typeof(SpringManPatches));
+		Harmony.CreateAndPatchAll(typeof(ButlerEnemyPatches));
+		Harmony.CreateAndPatchAll(typeof(EnemyAIPatches));
 
 		Harmony.CreateAndPatchAll(typeof(StartOfRoundPatches));
 
@@ -39,5 +40,7 @@ public class EnemyDebug : BaseUnityPlugin
 		Harmony.CreateAndPatchAll(typeof(GizmoPatches));
 
 		EnemyDebugDynamicConfig.RegisterDynamicConfig();
+
+		Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
 	}
 }
