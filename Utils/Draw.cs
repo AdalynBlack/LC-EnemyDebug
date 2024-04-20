@@ -40,7 +40,6 @@ public static class Draw
 
 		foreach (float angle in ConeData.Keys)
 		{
-			EnemyDebug.HarmonyLog.LogDebug($"Drawing cones of angle {angle}");
 			DrawAs(ConeData[angle], ConeMesh[angle]);
 		}
 	}

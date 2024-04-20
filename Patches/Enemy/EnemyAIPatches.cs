@@ -6,7 +6,9 @@ using LethalConfig.ConfigItems;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using UnityEngine;
 
@@ -24,8 +26,8 @@ public class EnemyAIPatches
 		if (!__instance.debugEnemyAI)
 			return;
 		if (proximityAwareness > 0)
-			Draw.Sphere(__instance.transform.position, proximityAwareness, color: new Color(0f, 1f, 0f, 0.1f), duration: 0.2f);
-		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(0f, 1f, 0f, .1f), angle: width, duration: 0.2f);
+			Draw.Sphere(__instance.transform.position, proximityAwareness, color: new Color(0f, 1f, 0f, 0.1f));
+		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(0f, 1f, 0f, .1f), angle: width);
 	}
 
 	[HarmonyPatch("CheckLineOfSightForClosestPlayer")]
@@ -35,8 +37,8 @@ public class EnemyAIPatches
 		if (!__instance.debugEnemyAI)
 			return;
 		if (proximityAwareness > 0)
-			Draw.Sphere(__instance.transform.position, proximityAwareness, color: new Color(1f, 1f, 0f, 0.1f), duration: 0.2f);
-		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(1f, 1f, 0f, .1f), angle: width, duration: 0.2f);
+			Draw.Sphere(__instance.transform.position, proximityAwareness, color: new Color(1f, 1f, 0f, 0.1f));
+		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(1f, 1f, 0f, .1f), angle: width);
 	}
 
 	[HarmonyPatch("CheckLineOfSightForPosition")]
@@ -46,10 +48,10 @@ public class EnemyAIPatches
 		if (!__instance.debugEnemyAI)
 			return;
 		var eye = overrideEye != null ? overrideEye : __instance.transform;
-		Draw.Cube(objectPosition, new Vector3(0.9f, 0.9f, 0.9f), color: new Color(1f, 0f, 0f, 0.1f), duration: 0.2f);
+		Draw.Cube(objectPosition, new Vector3(0.9f, 0.9f, 0.9f), color: new Color(1f, 0f, 0f, 0.1f));
 		if (proximityAwareness > 0)
-			Draw.Sphere(eye.position, proximityAwareness, color: new Color(1f, 0f, 0f, 0.1f), duration: 0.2f);
-		Draw.Cone(eye.position, eye.position + (eye.forward * range), color: new Color(1f, 0f, 0f, .1f), angle: width, duration: 0.2f);
+			Draw.Sphere(eye.position, proximityAwareness, color: new Color(1f, 0f, 0f, 0.1f));
+		Draw.Cone(eye.position, eye.position + (eye.forward * range), color: new Color(1f, 0f, 0f, .1f), angle: width);
 	}
 
 	[HarmonyPatch("Start")]
@@ -101,6 +103,7 @@ public class EnemyAIPatches
 				"Values to debug for this enemy");
 
 		debugValuesEntry.SettingChanged += (_obj, _args ) => ChangeDebugValues(__instance.enemyType.enemyName, debugValuesEntry);
+		ChangeDebugValues(__instance.enemyType.enemyName, debugValuesEntry);
 
 		var list = new TextInputFieldConfigItem(debugValuesEntry, requiresRestart: false);
 		LethalConfigManager.AddConfigItem(list);
@@ -121,8 +124,20 @@ public class EnemyAIPatches
 			DebugValues[enemyName].Add(field);
 	}
 
+	[HarmonyDebug]
+	[HarmonyPatch("CheckLineOfSightForPosition")]
+	[HarmonyTranspiler]
+	static IEnumerable<CodeInstruction> TranspileLineOfSightFunction(IEnumerable<CodeInstruction> instructions)
+	{
+		return new CodeMatcher(instructions)
+			.MatchForward(false,
+					new CodeMatch(OpCodes.Ldc_R4),
+					new CodeMatch(OpCodes.Call))
+			.SetOperandAndAdvance(0f)
+			.InstructionEnumeration();
+	}
+
 	[HarmonyPatch("Update")]
-	[HarmonyPriority(500)]
 	[HarmonyPrefix]
 	static void UpdatePrefixPatch(EnemyAI __instance)
 	{
@@ -168,36 +183,51 @@ public class EnemyAIPatches
 
 	private static void ApplyStrings(EnemyAI __instance, ScanNodeProperties nodeProps)
 	{
-		string subText = SubTextBuilder.ToString();
-
+		var subText = SubTextBuilder.ToString();
 		if (subText == "")
-		{
 			ApplyDefaultStrings(__instance);
-			subText = SubTextBuilder.ToString();
-		}
 
 		DebugValues.TryGetValue(__instance.enemyType.enemyName, out var fields);
 		if (fields != null)
+		{
 			foreach (var field in fields)
 			{
-				var fieldInfo = __instance.GetType().GetField(field, BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance);
+				FieldInfo fieldInfo;
+
+				try {
+					fieldInfo = __instance.GetType().GetField(field.Trim(), BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance);
+				} catch (Exception e) {
+					SubTextBuilder
+						.AppendLine($"Unable to locate {field.Trim()}");
+					EnemyDebug.HarmonyLog.LogError(e.ToString());
+					continue;
+				}
+
+				var fieldType = fieldInfo.FieldType;
 				var fieldValue = fieldInfo.GetValue(__instance);
 				var fieldString = fieldValue.ToString();
 
 				// For arrays, lists, etc, use String.Join() instead of Object.ToString()
-				if (typeof(System.Object[]).IsAssignableFrom(fieldValue.GetType()))
-					fieldString = String.Join(", ", fieldValue as System.Object[]);
-				if (typeof(IEnumerable).IsAssignableFrom(fieldValue.GetType()))
-					fieldString = String.Join(", ", fieldValue as IEnumerable);
+				if (typeof(IEnumerable).IsAssignableFrom(fieldType))
+				{
+					// Do *not* touch this without retesting. Please.
+					var array = (IEnumerable)fieldValue;
+					fieldString = "\n\t" + String.Join(",\n\t", array.Cast<object>());
+				}
 
-				SubTextBuilder.Append(fieldInfo.ToString())
+
+				SubTextBuilder
+					.Append(field.Trim())
 					.Append(fieldInfo.FieldType.IsSubclassOf(typeof(bool)) ? "? " : ": ")
-					.Append(fieldInfo.GetValue(__instance).ToString())
+					.Append(fieldString)
 					.Append("\n");
 			}
+		}
+
 
 		nodeProps.headerText = HeaderTextBuilder.ToString();
-		nodeProps.subText = subText;
+		nodeProps.subText = SubTextBuilder.ToString();
+		EnemyDebug.HarmonyLog.LogDebug(nodeProps.subText);
 	}
 
 	private static void ApplyDefaultStrings(EnemyAI __instance)
@@ -209,7 +239,7 @@ public class EnemyAIPatches
 	private static void ApplyStateStrings(EnemyAI __instance)
 	{
 		HeaderTextBuilder.Append("Current State");
-		SubTextBuilder.Append($"{__instance.currentBehaviourStateIndex}");
+		SubTextBuilder.AppendLine($"{__instance.currentBehaviourStateIndex}");
 	}
 
 	private static bool ApplySearchStrings(EnemyAI __instance)
@@ -233,7 +263,7 @@ public class EnemyAIPatches
 			.AppendLine($"Waiting for target? {search.waitingForTargetNode}")
 			.AppendLine($"Target chosen? {search.choseTargetNode}")
 			.AppendLine($"Looping? {search.loopSearch}")
-			.Append($"Calculating node? {search.calculatingNodeInSearch}");
+			.AppendLine($"Calculating node? {search.calculatingNodeInSearch}");
 		
 		DrawSearchGizmos(__instance);
 
