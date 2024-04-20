@@ -88,14 +88,7 @@ public class EnemyAIPatches
 		if(EnemyConfigs.ContainsKey(__instance.enemyType.enemyName))
 			return EnemyConfigs[__instance.enemyType.enemyName];
 
-		string enemyTypeString = "Inside";
-
-		if (__instance.enemyType.isDaytimeEnemy)
-			enemyTypeString = "Daytime";
-		else if (__instance.enemyType.isOutsideEnemy)
-			enemyTypeString = "Outside";
-
-		var settingPath = $"Enemies.{enemyTypeString}.{__instance.enemyType.enemyName}";
+		var settingPath = $"Enemy.{__instance.enemyType.enemyName}";
 
 		var enabledEntry = EnemyDebugConfig.EnemyDebugFile.Bind<bool>(
 				settingPath,
@@ -202,6 +195,9 @@ public class EnemyAIPatches
 		{
 			foreach (var field in fields)
 			{
+				if (field == "")
+					continue;
+
 				FieldInfo fieldInfo;
 
 				try {
