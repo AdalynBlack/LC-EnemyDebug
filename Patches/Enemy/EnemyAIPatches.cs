@@ -28,8 +28,8 @@ public class EnemyAIPatches
 		if (!__instance.debugEnemyAI)
 			return;
 		if (proximityAwareness > 0)
-			Draw.Sphere(__instance.transform.position, proximityAwareness, color: new Color(0f, 1f, 0f, 0.1f));
-		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(0f, 1f, 0f, .1f), angle: width);
+			Draw.Sphere(__instance.transform.position, proximityAwareness, color: new Color(0f, 1f, 0f, 0.1f), duration: FovTimeEntries[__instance.enemyType.enemyName]);
+		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(0f, 1f, 0f, .1f), angle: width, duration: FovTimeEntries[__instance.enemyType.enemyName]);
 	}
 
 	[HarmonyPatch("CheckLineOfSightForClosestPlayer")]
@@ -41,8 +41,8 @@ public class EnemyAIPatches
 		if (!__instance.debugEnemyAI)
 			return;
 		if (proximityAwareness > 0)
-			Draw.Sphere(__instance.transform.position, proximityAwareness, color: new Color(1f, 1f, 0f, 0.1f));
-		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(1f, 1f, 0f, .1f), angle: width);
+			Draw.Sphere(__instance.transform.position, proximityAwareness, color: new Color(1f, 1f, 0f, 0.1f), duration: FovTimeEntries[__instance.enemyType.enemyName]);
+		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(1f, 1f, 0f, .1f), angle: width, duration: FovTimeEntries[__instance.enemyType.enemyName]);
 	}
 
 	[HarmonyPatch("CheckLineOfSightForPosition")]
@@ -56,12 +56,12 @@ public class EnemyAIPatches
 
 		var eye = overrideEye != null ? overrideEye : __instance.transform;
 
-		Draw.Cube(objectPosition, new Vector3(0.9f, 0.9f, 0.9f), color: new Color(1f, 0f, 0f, 0.1f));
+		Draw.Cube(objectPosition, new Vector3(0.9f, 0.9f, 0.9f), color: new Color(1f, 0f, 0f, 0.1f), duration: FovTimeEntries[__instance.enemyType.enemyName]);
 
 		if (proximityAwareness > 0)
-			Draw.Sphere(eye.position, proximityAwareness, color: new Color(1f, 0f, 0f, 0.1f));
+			Draw.Sphere(eye.position, proximityAwareness, color: new Color(1f, 0f, 0f, 0.1f), duration: FovTimeEntries[__instance.enemyType.enemyName]);
 
-		Draw.Cone(eye.position, eye.position + (eye.forward * range), color: new Color(1f, 0f, 0f, .1f), angle: width);
+		Draw.Cone(eye.position, eye.position + (eye.forward * range), color: new Color(1f, 0f, 0f, .1f), angle: width, duration: FovTimeEntries[__instance.enemyType.enemyName]);
 	}
 
 	[HarmonyPatch("Start")]
@@ -83,6 +83,8 @@ public class EnemyAIPatches
 		};
 	}
 	
+	static internal Dictionary<string, float> FovTimeEntries = new Dictionary<string, float>();
+
 	static ConfigEntry<bool> GetOrBindConfigEntry(EnemyAI __instance)
 	{
 		if(EnemyConfigs.ContainsKey(__instance.enemyType.enemyName))
@@ -98,6 +100,16 @@ public class EnemyAIPatches
 
 		var checkbox = new BoolCheckBoxConfigItem(enabledEntry, requiresRestart: false);
 		LethalConfigManager.AddConfigItem(checkbox);
+
+		var fovTimeEntry = EnemyDebugConfig.EnemyDebugFile.Bind<float>(
+				settingPath,
+				"FoV Timeout",
+				0f,
+				"How long to display the FoV cone for");
+
+		fovTimeEntry.SettingChanged += (_obj, _args) => FovTimeEntries[__instance.enemyType.enemyName] = fovTimeEntry.Value;
+		FovTimeEntries[__instance.enemyType.enemyName] = fovTimeEntry.Value;
+		LethalConfigManager.AddConfigItem(new FloatSliderConfigItem(fovTimeEntry, requiresRestart: false));
 
 		var debugValuesEntry = EnemyDebugConfig.EnemyDebugFile.Bind<string>(
 				settingPath,
