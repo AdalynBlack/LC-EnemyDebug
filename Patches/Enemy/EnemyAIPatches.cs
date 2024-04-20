@@ -23,6 +23,8 @@ public class EnemyAIPatches
 	[HarmonyPrefix]
 	static void CheckLineOfSightForPlayerPrefix(EnemyAI __instance, float width, int range, int proximityAwareness)
 	{
+		if (!EnemyDebugConfig.ShouldDrawFov.Value)
+			return;
 		if (!__instance.debugEnemyAI)
 			return;
 		if (proximityAwareness > 0)
@@ -34,6 +36,8 @@ public class EnemyAIPatches
 	[HarmonyPrefix]
 	static void CheckLineOfSightForClosestPlayerPrefix(EnemyAI __instance, float width, int range, int proximityAwareness)
 	{
+		if (!EnemyDebugConfig.ShouldDrawFov.Value)
+			return;
 		if (!__instance.debugEnemyAI)
 			return;
 		if (proximityAwareness > 0)
@@ -45,12 +49,18 @@ public class EnemyAIPatches
 	[HarmonyPrefix]
 	static void CheckLineOfSightForPositionPrefix(EnemyAI __instance, Vector3 objectPosition, float width, int range, float proximityAwareness, Transform overrideEye)
 	{
+		if (!EnemyDebugConfig.ShouldDrawFov.Value)
+			return;
 		if (!__instance.debugEnemyAI)
 			return;
+
 		var eye = overrideEye != null ? overrideEye : __instance.transform;
+
 		Draw.Cube(objectPosition, new Vector3(0.9f, 0.9f, 0.9f), color: new Color(1f, 0f, 0f, 0.1f));
+
 		if (proximityAwareness > 0)
 			Draw.Sphere(eye.position, proximityAwareness, color: new Color(1f, 0f, 0f, 0.1f));
+
 		Draw.Cone(eye.position, eye.position + (eye.forward * range), color: new Color(1f, 0f, 0f, .1f), angle: width);
 	}
 

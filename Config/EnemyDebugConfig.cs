@@ -21,6 +21,7 @@ public static class EnemyDebugConfig
 
 	// Misc
 	public static ConfigEntry<bool> ShouldDrawDefaultGizmos;
+	public static ConfigEntry<bool> ShouldDrawFov;
 
 	//Advanced
 	public static ConfigEntry<bool> ShouldDrawOrigin;
@@ -61,6 +62,11 @@ public static class EnemyDebugConfig
 		ShouldDrawDefaultGizmos = EnemyDebugFile.Bind<bool>(
 				"Misc",
 				"Should Draw Default Gizmos?",
+				true);
+
+		ShouldDrawFov = EnemyDebugFile.Bind<bool>(
+				"Misc",
+				"Should Draw Fov?",
 				true);
 
 		// Advanced
