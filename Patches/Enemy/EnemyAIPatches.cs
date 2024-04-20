@@ -233,7 +233,6 @@ public class EnemyAIPatches
 
 		nodeProps.headerText = HeaderTextBuilder.ToString();
 		nodeProps.subText = SubTextBuilder.ToString();
-		EnemyDebug.HarmonyLog.LogDebug(nodeProps.subText);
 	}
 
 	private static void ApplyDefaultStrings(EnemyAI __instance)
