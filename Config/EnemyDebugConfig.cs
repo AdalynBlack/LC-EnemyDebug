@@ -19,13 +19,18 @@ public static class EnemyDebugConfig
 	public static ConfigEntry<bool> ShowTargetedNode;
 	public static ConfigEntry<bool> ShowNextTargetNode;
 
+	// FoV
+	public static ConfigEntry<bool> GetAllPlayers;
+	public static ConfigEntry<bool> CheckForPlayer;
+	public static ConfigEntry<bool> CheckForClosestPlayer;
+	public static ConfigEntry<bool> CheckForPosition;
+
 	// Misc
 	public static ConfigEntry<bool> ShouldDrawDefaultGizmos;
-	public static ConfigEntry<bool> ShouldDrawFov;
 
 	//Advanced
 	public static ConfigEntry<bool> ShouldDrawOrigin;
-
+	public static ConfigEntry<bool> ShowExtraSearchDebug;
 
 	public static void BindAllTo(ConfigFile config)
 	{
@@ -57,6 +62,27 @@ public static class EnemyDebugConfig
 				"Search",
 				"Show Next Target Node",
 				false);
+		
+		// FoV
+		GetAllPlayers = EnemyDebugFile.Bind<bool>(
+				"FoV",
+				"Display GetAllPlayers FoV? (green)",
+				true);
+
+		CheckForPlayer = EnemyDebugFile.Bind<bool>(
+				"FoV",
+				"Display CheckForPlayer FoV? (green)",
+				true);
+
+		CheckForClosestPlayer = EnemyDebugFile.Bind<bool>(
+				"FoV",
+				"Display CheckForClosestPlayer FoV? (yellow)",
+				true);
+
+		CheckForPosition = EnemyDebugFile.Bind<bool>(
+				"FoV",
+				"Display CheckForPosition FoV? (red)",
+				true);
 
 		// Misc
 		ShouldDrawDefaultGizmos = EnemyDebugFile.Bind<bool>(
@@ -64,15 +90,15 @@ public static class EnemyDebugConfig
 				"Should Draw Default Gizmos?",
 				true);
 
-		ShouldDrawFov = EnemyDebugFile.Bind<bool>(
-				"Misc",
-				"Should Draw Fov?",
-				true);
-
 		// Advanced
 		ShouldDrawOrigin = EnemyDebugFile.Bind<bool>(
 				"Advanced",
 				"Should Draw Origin?",
+				false);
+
+		ShowExtraSearchDebug = EnemyDebugFile.Bind<bool>(
+				"Advanced",
+				"Show Advanced Search Information?",
 				false);
 
 		// Remove now unused value

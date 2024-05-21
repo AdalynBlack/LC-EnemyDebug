@@ -20,10 +20,15 @@ internal static class EnemyDebugDynamicConfig
 				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShowTargetedNode, requiresRestart: false),
 				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShowNextTargetNode, requiresRestart: false),
 
-				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShouldDrawDefaultGizmos, requiresRestart: false),
-				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShouldDrawFov, requiresRestart: false),
+				new BoolCheckBoxConfigItem(EnemyDebugConfig.GetAllPlayers, requiresRestart: false),
+				new BoolCheckBoxConfigItem(EnemyDebugConfig.CheckForPlayer, requiresRestart: false),
+				new BoolCheckBoxConfigItem(EnemyDebugConfig.CheckForClosestPlayer, requiresRestart: false),
+				new BoolCheckBoxConfigItem(EnemyDebugConfig.CheckForPosition, requiresRestart: false),
 
-				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShouldDrawOrigin, requiresRestart: false)});
+				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShouldDrawDefaultGizmos, requiresRestart: false),
+
+				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShouldDrawOrigin, requiresRestart: false),
+				new BoolCheckBoxConfigItem(EnemyDebugConfig.ShowExtraSearchDebug, requiresRestart: false)});
 	}
 
 	internal static void AddConfigItems(IEnumerable<BaseConfigItem> configItems)

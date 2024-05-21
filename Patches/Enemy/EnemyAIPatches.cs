@@ -19,11 +19,28 @@ public class EnemyAIPatches
 {
 	internal static Dictionary<string, ConfigEntry<bool>> EnemyConfigs = new Dictionary<string, ConfigEntry<bool>>();
 
+	[HarmonyPatch("GetAllPlayersInLineOfSight")]
+	[HarmonyPrefix]
+	static void GetAllPlayersInLineOfSightPrefix(EnemyAI __instance, float width, int range, Transform eyeObject, float proximityCheck)
+	{
+		if (!EnemyDebugConfig.GetAllPlayers.Value)
+			return;
+		if (!__instance.debugEnemyAI)
+			return;
+
+		var eye = eyeObject != null ? eyeObject : __instance.eye;
+		eye = eye == null ? __instance.transform : eye;
+
+		if (proximityCheck > 0)
+			Draw.Sphere(eye.position, proximityCheck, color: new Color(0f, 1f, 0f, 0.1f), duration: FovTimeEntries[__instance.enemyType.enemyName]);
+		Draw.Cone(eye.position, eye.position + (eye.forward * range), color: new Color(0f, 1f, 0f, .1f), angle: width, duration: FovTimeEntries[__instance.enemyType.enemyName]);
+	}
+
 	[HarmonyPatch("CheckLineOfSightForPlayer")]
 	[HarmonyPrefix]
 	static void CheckLineOfSightForPlayerPrefix(EnemyAI __instance, float width, int range, int proximityAwareness)
 	{
-		if (!EnemyDebugConfig.ShouldDrawFov.Value)
+		if (!EnemyDebugConfig.CheckForPlayer.Value)
 			return;
 		if (!__instance.debugEnemyAI)
 			return;
@@ -36,7 +53,7 @@ public class EnemyAIPatches
 	[HarmonyPrefix]
 	static void CheckLineOfSightForClosestPlayerPrefix(EnemyAI __instance, float width, int range, int proximityAwareness)
 	{
-		if (!EnemyDebugConfig.ShouldDrawFov.Value)
+		if (!EnemyDebugConfig.CheckForClosestPlayer.Value)
 			return;
 		if (!__instance.debugEnemyAI)
 			return;
@@ -49,12 +66,13 @@ public class EnemyAIPatches
 	[HarmonyPrefix]
 	static void CheckLineOfSightForPositionPrefix(EnemyAI __instance, Vector3 objectPosition, float width, int range, float proximityAwareness, Transform overrideEye)
 	{
-		if (!EnemyDebugConfig.ShouldDrawFov.Value)
+		if (!EnemyDebugConfig.CheckForPosition.Value)
 			return;
 		if (!__instance.debugEnemyAI)
 			return;
 
-		var eye = overrideEye != null ? overrideEye : __instance.transform;
+		var eye = overrideEye != null ? overrideEye : __instance.eye;
+		eye = eye == null ? __instance.transform : eye;
 
 		Draw.Cube(objectPosition, new Vector3(0.9f, 0.9f, 0.9f), color: new Color(1f, 0f, 0f, 0.1f), duration: FovTimeEntries[__instance.enemyType.enemyName]);
 
@@ -160,13 +178,9 @@ public class EnemyAIPatches
 		DebugPatches.SetEnemy(true);
 		DebugPatches.SetEnemyDebug(__instance.debugEnemyAI);
 
-		HeaderTextBuilder = new StringBuilder();
 		SubTextBuilder = new StringBuilder();
-
-		HeaderTextBuilder.Append($"{__instance.enemyType.enemyName}: ");
 	}
 
-	public static StringBuilder HeaderTextBuilder = new StringBuilder();
 	public static StringBuilder SubTextBuilder = new StringBuilder();
 
 	[HarmonyPatch("Update")]
@@ -176,6 +190,9 @@ public class EnemyAIPatches
 		// Inform the debug patch that all draw calls are no longer from an enemy
 		DebugPatches.SetEnemy(false);
 		DebugPatches.SetEnemyDebug(false);
+
+		if (EnemyDebug.Inputs.FreezeEnemiesKey.triggered)
+			__instance.agent.Stop();
 
 		if (!__instance.debugEnemyAI)
 			return;
@@ -243,20 +260,13 @@ public class EnemyAIPatches
 		}
 
 
-		nodeProps.headerText = HeaderTextBuilder.ToString();
+		nodeProps.headerText = $"{__instance.enemyType.enemyName}";
 		nodeProps.subText = SubTextBuilder.ToString();
 	}
 
 	private static void ApplyDefaultStrings(EnemyAI __instance)
 	{
-		if (!ApplySearchStrings(__instance))
-			ApplyStateStrings(__instance);
-	}
-
-	private static void ApplyStateStrings(EnemyAI __instance)
-	{
-		HeaderTextBuilder.Append("Current State");
-		SubTextBuilder.AppendLine($"{__instance.currentBehaviourStateIndex}");
+		ApplySearchStrings(__instance);
 	}
 
 	private static bool ApplySearchStrings(EnemyAI __instance)
@@ -269,18 +279,14 @@ public class EnemyAIPatches
 		if (!search.inProgress)
 			return false;
 
-		HeaderTextBuilder.Append("Searching");
-
 		SubTextBuilder
-			.AppendLine($"{search.nodesEliminatedInCurrentSearch}/{__instance.allAINodes.Length} nodes searched")
 			.AppendLine($"Search width: {search.searchWidth}")
-			.AppendLine($"Search precision: {search.searchPrecision}")
-			.AppendLine($"Has finished {search.timesFinishingSearch} times")
-			.AppendLine($"Randomized? {search.randomized}")
-			.AppendLine($"Waiting for target? {search.waitingForTargetNode}")
-			.AppendLine($"Target chosen? {search.choseTargetNode}")
-			.AppendLine($"Looping? {search.loopSearch}")
-			.AppendLine($"Calculating node? {search.calculatingNodeInSearch}");
+			.AppendLine($"Search precision: {search.searchPrecision}");
+
+		if (EnemyDebugConfig.ShowExtraSearchDebug.Value)
+			SubTextBuilder
+				.AppendLine($"Randomized? {search.randomized}")
+				.AppendLine($"Looping? {search.loopSearch}");
 		
 		DrawSearchGizmos(__instance);
 

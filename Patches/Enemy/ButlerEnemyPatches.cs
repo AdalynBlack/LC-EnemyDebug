@@ -34,7 +34,6 @@ public class ButlerEnemyPatches
 			if (i == (int)__instance.targetPlayer.playerClientId)
 			{
 				Draw.Sphere(cameraTransform.position + cameraTransform.forward + ((-cameraTransform.right + cameraTransform.up) * 0.5f), 0.1f, color: new Color(0f, 1f, 0f, 1f));
-				Draw.Cube(cameraTransform.position - Vector3.up, new Vector3(2, 3, 2), color: new Color(0f, 1f, 0f, 1f));
 			}
 
 			if (!seenPlayers[i])
@@ -54,7 +53,6 @@ public class ButlerEnemyPatches
 
 			var normalizedTime = 1 - (timeSinceSeeing / timeout);
 
-			Draw.Cube(cameraTransform.position - Vector3.up, new Vector3(2, 3, 2), color: new Color(normalizedTime, timeout == 12 ? 1f : 0f, 0f, 1f));
 			Draw.Sphere(cameraTransform.position + cameraTransform.forward + ((cameraTransform.right + cameraTransform.up) * 0.5f), 0.1f, color: new Color(normalizedTime, 0f, 0f, 1f));
 		}
 	}
