@@ -1,3 +1,21 @@
+# !!Deprecation Notice!!
+I've been working with [Giosuel](https://github.com/giosuel) for a while now to port all the features of this mod over to [Imperium](https://github.com/giosuel/imperium). For now, this mod is in a sort of "limbo" state, as some features have yet to be ported, while others have, but this mod will slowly stop receiving support, and will be deprecated as soon as Imperium reaches feature parity
+
+Currently ported features:
+- Line of Sight Visualization
+
+Unported Features:
+- Generic Debug Visualizers
+- Generic Gizmo Visualizers
+- Enemy-specific visualizers
+  - Brackens
+  - Hoarding Bugs
+  - Eyeless Dogs
+  - Baboon Hawks
+  - Butlers
+  - Coilheads
+- Debug Variable Watchers
+
 # Enemy Debug
 Allows you to debug enemies in-game through the use of a custom gizmo system
 Some gizmos shown are the result of existing gizmo draw calls that the game uses, while others are custom to help with understanding the underlying mechanics of enemies. Custom gizmos are uniquely colored to help make the system easier to understand
