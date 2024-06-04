@@ -39,6 +39,7 @@ public class EnemyDebug : BaseUnityPlugin
 		Harmony.CreateAndPatchAll(typeof(EnemyAIPatches));
 
 		Harmony.CreateAndPatchAll(typeof(StartOfRoundPatches));
+		Harmony.CreateAndPatchAll(typeof(RoundManagerPatches));
 
 		Harmony.CreateAndPatchAll(typeof(HUDManagerPatches));
 

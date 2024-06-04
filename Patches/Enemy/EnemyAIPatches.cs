@@ -192,7 +192,7 @@ public class EnemyAIPatches
 		DebugPatches.SetEnemyDebug(false);
 
 		if (EnemyDebug.Inputs.FreezeEnemiesKey.triggered)
-			__instance.agent.Stop();
+			__instance.agent.isStopped = true;
 
 		if (!__instance.debugEnemyAI)
 			return;
