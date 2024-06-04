@@ -36,6 +36,7 @@ public class EnemyDebug : BaseUnityPlugin
 		Harmony.CreateAndPatchAll(typeof(MouthDogPatches));
 		Harmony.CreateAndPatchAll(typeof(SpringManPatches));
 		Harmony.CreateAndPatchAll(typeof(ButlerEnemyPatches));
+		Harmony.CreateAndPatchAll(typeof(RadMechAIPatches));
 		Harmony.CreateAndPatchAll(typeof(EnemyAIPatches));
 
 		Harmony.CreateAndPatchAll(typeof(StartOfRoundPatches));
