@@ -33,7 +33,7 @@ public class EnemyAIPatches
 
 		if (proximityCheck > 0)
 			Draw.Sphere(eye.position, proximityCheck, color: new Color(0f, 1f, 0f, 0.1f), duration: FovTimeEntries[__instance.enemyType.enemyName]);
-		Draw.Cone(eye.position, eye.position + (eye.forward * range), color: new Color(0f, 1f, 0f, .1f), angle: width, duration: FovTimeEntries[__instance.enemyType.enemyName]);
+		Draw.Cone(eye.position, eye.position + (eye.forward * range), color: new Color(0f, 1f, 0f, .1f), angle: width * 2, duration: FovTimeEntries[__instance.enemyType.enemyName]);
 	}
 
 	[HarmonyPatch("CheckLineOfSightForPlayer")]
@@ -46,7 +46,7 @@ public class EnemyAIPatches
 			return;
 		if (proximityAwareness > 0)
 			Draw.Sphere(__instance.transform.position, proximityAwareness, color: new Color(0f, 1f, 0f, 0.1f), duration: FovTimeEntries[__instance.enemyType.enemyName]);
-		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(0f, 1f, 0f, .1f), angle: width, duration: FovTimeEntries[__instance.enemyType.enemyName]);
+		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(0f, 1f, 0f, .1f), angle: width * 2, duration: FovTimeEntries[__instance.enemyType.enemyName]);
 	}
 
 	[HarmonyPatch("CheckLineOfSightForClosestPlayer")]
@@ -59,7 +59,7 @@ public class EnemyAIPatches
 			return;
 		if (proximityAwareness > 0)
 			Draw.Sphere(__instance.transform.position, proximityAwareness, color: new Color(1f, 1f, 0f, 0.1f), duration: FovTimeEntries[__instance.enemyType.enemyName]);
-		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(1f, 1f, 0f, .1f), angle: width, duration: FovTimeEntries[__instance.enemyType.enemyName]);
+		Draw.Cone(__instance.transform.position, __instance.transform.position + (__instance.transform.forward * range), color: new Color(1f, 1f, 0f, .1f), angle: width * 2, duration: FovTimeEntries[__instance.enemyType.enemyName]);
 	}
 
 	[HarmonyPatch("CheckLineOfSightForPosition")]
@@ -79,7 +79,7 @@ public class EnemyAIPatches
 		if (proximityAwareness > 0)
 			Draw.Sphere(eye.position, proximityAwareness, color: new Color(1f, 0f, 0f, 0.1f), duration: FovTimeEntries[__instance.enemyType.enemyName]);
 
-		Draw.Cone(eye.position, eye.position + (eye.forward * range), color: new Color(1f, 0f, 0f, .1f), angle: width, duration: FovTimeEntries[__instance.enemyType.enemyName]);
+		Draw.Cone(eye.position, eye.position + (eye.forward * range), color: new Color(1f, 0f, 0f, .1f), angle: width * 2, duration: FovTimeEntries[__instance.enemyType.enemyName]);
 	}
 
 	[HarmonyPatch("Start")]
