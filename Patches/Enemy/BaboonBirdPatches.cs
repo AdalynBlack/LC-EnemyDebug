@@ -16,13 +16,16 @@ public class BaboonBirdPatches
 		if (!EnemyDebugConfig.CheckForPosition.Value)
 			return;
 
-		Draw.Sphere(__instance.eye.position, 2, color: new Color(0f, 0f, 1f, 0.1f), duration: 0.2f);
-		Draw.Cone(__instance.eye.position, __instance.eye.position + (__instance.eye.forward * 20), color: new Color(0f, 0f, 1f, .1f), angle: __instance.fov, duration: 0.2f);
+		Draw.Sphere(__instance.eye.position + __instance.eye.forward * 38f + __instance.eye.up * 8f, 40, color: new Color(0f, 0f, 1f, 0.1f), duration: __instance.AIIntervalTime);
 
-		Draw.Cone(__instance.eye.position, __instance.eye.position + (__instance.eye.forward * 10), color: new Color(1f, 0f, 0f, .1f), angle: __instance.fov, duration: 0.2f);
+		// Should be 2 * __instance.fov, but due to the sphere intersection, I'm ignoring that
+		Draw.Cone(__instance.eye.position, __instance.eye.position + (__instance.eye.forward * 20), color: new Color(0f, 0f, 1f, .1f), angle: 180, duration: __instance.AIIntervalTime);
 
-		Draw.Cone(__instance.eye.position, __instance.eye.position + (__instance.eye.forward * 16), color: new Color(1f, 1f, 0f, .1f), angle: 80, duration: 0.2f);
+		// Should be 2 * __instance.fov, but due to the sphere intersection, I'm ignoring that
+		Draw.Cone(__instance.eye.position, __instance.eye.position + (__instance.eye.forward * 10), color: new Color(1f, 0f, 0f, .1f), angle: 180, duration: __instance.AIIntervalTime);
 
-		Draw.Cone(__instance.eye.position, __instance.eye.position + (__instance.eye.forward * 20), color: new Color(0f, 1f, 0f, .1f), angle: 30, duration: 0.2f);
+		Draw.Cone(__instance.eye.position, __instance.eye.position + (__instance.eye.forward * 16), color: new Color(1f, 1f, 0f, .1f), angle: 2 * 80, duration: __instance.AIIntervalTime);
+
+		Draw.Cone(__instance.eye.position, __instance.eye.position + (__instance.eye.forward * 20), color: new Color(0f, 1f, 0f, .1f), angle: 2 * 30, duration: __instance.AIIntervalTime);
 	}
 }
