@@ -1,3 +1,4 @@
+using EnemyDebug.Config;
 using HarmonyLib;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,7 +20,7 @@ public class RoundManagerPatches
 		var indices = new List<int>();
 		for (int i = 0; i < triangulation.indices.Length / 3; i++)
 		{
-			if ((triangulation.areas[i] & 0x04) != 0)
+			if ((triangulation.areas[i] & EnemyDebugConfig.NavmeshBitmask.Value) != 0)
 			{
 				indices.Add(triangulation.indices[i * 3]);
 				indices.Add(triangulation.indices[i * 3 + 1]);

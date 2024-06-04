@@ -13,6 +13,7 @@ public static class EnemyDebugConfig
 	// World
 	public static ConfigEntry<bool> ShowPathingNodes;
 	public static ConfigEntry<bool> ShouldDrawWorldGizmos;
+	public static ConfigEntry<int> NavmeshBitmask;
 
 	// Search
 	public static ConfigEntry<bool> ShowSearchedNodes;
@@ -46,6 +47,11 @@ public static class EnemyDebugConfig
 				"World",
 				"Should Draw Default World Gizmos",
 				false);
+
+		NavmeshBitmask = EnemyDebugFile.Bind<int>(
+				"World",
+				"The Navmesh Bitmask to Draw",
+				0);
 
 		// Search
 		ShowSearchedNodes = EnemyDebugFile.Bind<bool>(
