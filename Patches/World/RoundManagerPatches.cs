@@ -42,6 +42,7 @@ public class RoundManagerPatches
 
 		var meshes = new List<Mesh>();
 
+		meshes.Add(GetNavmeshMeshFromTriangulation(triangulation));
 		for (int i = 1; i <= 0x200; i *= 2)
 		{
 			meshes.Add(GetNavmeshMeshFromTriangulation(triangulation, i));
@@ -50,7 +51,7 @@ public class RoundManagerPatches
 		return meshes;
 	}
 
-	static Mesh GetNavmeshMeshFromTriangulation(NavMeshTriangulation triangulation, int bitMask)
+	static Mesh GetNavmeshMeshFromTriangulation(NavMeshTriangulation triangulation, int bitMask = null)
 	{
 		var rawMesh = new Mesh();
 		rawMesh.SetVertices(triangulation.vertices);
@@ -58,7 +59,7 @@ public class RoundManagerPatches
 		var indices = new List<int>();
 		for (int i = 0; i < triangulation.indices.Length / 3; i++)
 		{
-			if ((triangulation.areas[i] & bitMask) != 0)
+			if (bitMask == null || (triangulation.areas[i] & bitMask) != 0)
 			{
 				indices.Add(triangulation.indices[i * 3]);
 				indices.Add(triangulation.indices[i * 3 + 1]);
